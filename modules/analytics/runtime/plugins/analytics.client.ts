@@ -147,7 +147,7 @@ export default defineNuxtPlugin(() => {
     }
     
     script.onload = () => {
-      console.log('[Analytics] Customer Privacy API loaded successfully')
+      // Customer Privacy API loaded successfully
     }
     
     document.head.appendChild(script)
@@ -160,17 +160,49 @@ export default defineNuxtPlugin(() => {
         
         window.Shopify.customerPrivacy.setTrackingConsent = function(consent, callback) {
           // Inject shop configuration like Hydrogen does
+          const rawCheckoutDomain = config.public?.analytics?.checkoutDomain || config.public?.shopify?.domain;
+          const rawStorefrontDomain = config.public?.shopify?.domain;
+          
+          // Don't use localhost domains - they won't work with Shopify
+          const isValidDomain = (domain: string) => domain && !domain.includes('localhost') && domain.includes('.');
+          
           const shopConfig = {
-            checkoutRootDomain: config.public?.analytics?.checkoutDomain || config.public?.shopify?.domain,
+            checkoutRootDomain: isValidDomain(rawCheckoutDomain) ? rawCheckoutDomain : undefined,
             storefrontAccessToken: config.public?.analytics?.storefrontAccessToken || config.public?.shopify?.storefrontAccessToken,
-            storefrontRootDomain: config.public?.shopify?.domain,
+            storefrontRootDomain: isValidDomain(rawStorefrontDomain) ? rawStorefrontDomain : undefined,
             headlessStorefront: true,
           }
           
-          console.log('[Analytics] Setting tracking consent with shop config:', { consent, shopConfig })
+          // Setting tracking consent with shop configuration
+          
+          // Build consent object according to Shopify docs for custom storefronts
+          const finalConsent = {
+            // Core consent decisions (user choice)
+            analytics: consent.analytics,
+            marketing: consent.marketing,
+            preferences: consent.preferences || consent.analytics, // fallback to analytics if not specified
+            sale_of_data: consent.sale_of_data,
+            
+            // Required for custom storefronts (headless)
+            headlessStorefront: true,
+            checkoutRootDomain: shopConfig.checkoutRootDomain,
+            storefrontRootDomain: shopConfig.storefrontRootDomain,
+            storefrontAccessToken: shopConfig.storefrontAccessToken,
+          };
+          
+          // Remove undefined values to avoid API issues
+          if (finalConsent.checkoutRootDomain === undefined) delete finalConsent.checkoutRootDomain;
+          if (finalConsent.storefrontRootDomain === undefined) delete finalConsent.storefrontRootDomain;
+          // Sending consent to Shopify
           
           // Call original method with injected config and update canTrack after
-          return originalSetTrackingConsent.call(this, { ...shopConfig, ...consent }, () => {
+          return originalSetTrackingConsent.call(this, finalConsent, (result?: any) => {
+            if (result?.error) {
+              console.error('[Analytics] Shopify consent error:', result.error);
+            }
+            
+            // Call the original callback
+            if (callback) callback();
             // Update canTrack function after consent change
             setTimeout(() => {
               const newCanTrackFunction = () => {
@@ -190,7 +222,6 @@ export default defineNuxtPlugin(() => {
               }
               
               analyticsContext.canTrack.value = newCanTrackFunction
-              console.log('[Analytics] canTrack function updated after consent change:', newCanTrackFunction())
             }, 100)
             
             // Call original callback if provided
@@ -210,8 +241,6 @@ export default defineNuxtPlugin(() => {
         }
         
         analyticsContext.canTrack.value = newCanTrackFunction
-        
-        console.log('[Analytics] Customer Privacy API initialized - canTrack:', newCanTrackFunction())
         return true
       }
       return false
@@ -268,7 +297,6 @@ export default defineNuxtPlugin(() => {
           }
           
           analyticsContext.canTrack.value = newCanTrackFunction
-          console.log('[Analytics] canTrack updated from consent store:', newValue, newCanTrackFunction())
         }, { immediate: true })
       }
     } catch (e) {
@@ -448,13 +476,7 @@ export default defineNuxtPlugin(() => {
     ready()
   })()
 
-  // Log analytics context status for debugging
-  console.log('[Analytics] Plugin loaded - canTrack available:', !!analyticsContext.canTrack.value)
-  console.log('[Analytics] canTrack.value type:', typeof analyticsContext.canTrack.value)
-  console.log('[Analytics] canTrack.value:', analyticsContext.canTrack.value)
-  if (typeof analyticsContext.canTrack.value === 'function') {
-    console.log('[Analytics] Initial canTrack result:', analyticsContext.canTrack.value())
-  }
+  // Analytics plugin initialized
 
   // Provide analytics context globally
   return {
@@ -706,7 +728,7 @@ function setupFallbackPrivacyApi(context: AnalyticsContextValue) {
     marketingAllowed: () => true,
     saleOfDataAllowed: () => true,
     setTrackingConsent: (consent: any, callback?: () => void) => {
-      console.log('[Analytics] Mock consent set:', consent)
+              // Mock consent set
       if (callback) callback()
     }
   }

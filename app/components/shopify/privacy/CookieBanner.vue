@@ -177,7 +177,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, nextTick } from "vue";
+import { ref, computed, onMounted, nextTick, watch } from "vue";
 import { useConsentStore } from "~/stores/consent";
 
 // Get consent store and analytics context
@@ -201,25 +201,33 @@ const showBanner = computed({
     }
   },
 });
-const analyticsConsent = computed({
-  get: () => consentStore.analytics,
-  set: (value) => (consentStore.analytics = value),
-});
-const marketingConsent = computed({
-  get: () => consentStore.marketing,
-  set: (value) => (consentStore.marketing = value),
-});
+// Local state for toggles (separate from store until user saves)
+const analyticsConsent = ref(consentStore.analytics);
+const marketingConsent = ref(consentStore.marketing);
+
+// Sync local toggles with store when store changes externally
+watch(
+  () => [consentStore.analytics, consentStore.marketing],
+  ([newAnalytics, newMarketing]) => {
+    analyticsConsent.value = newAnalytics;
+    marketingConsent.value = newMarketing;
+  }
+);
 
 // Initialize consent store and check Shopify API
 onMounted(() => {
   // Initialize store from localStorage
   consentStore.initializeFromStorage();
 
+  // Sync local toggles with loaded store values
+  analyticsConsent.value = consentStore.analytics;
+  marketingConsent.value = consentStore.marketing;
+
   // Set ready after store initialization (with small delay to prevent flash)
   nextTick(() => {
     setTimeout(() => {
       isReady.value = true;
-      console.log("[Cookie Banner] Ready - banner cloaking disabled");
+      // Banner ready
     }, 100);
   });
 
@@ -233,15 +241,13 @@ function checkShopifyAPI() {
     if (window.Shopify?.customerPrivacy) {
       clearInterval(checkInterval);
 
-      // Sync current state from Shopify API
-      consentStore.syncFromShopifyAPI();
+      // Wait a bit longer to ensure any previous saves have been processed
+      setTimeout(() => {
+        // Sync current state from Shopify API
+        consentStore.syncFromShopifyAPI();
 
-      console.log("[Cookie Banner] Shopify API loaded, state synced:", {
-        shouldShowBanner: consentStore.shouldShowBanner,
-        hasDecision: consentStore.hasConsentDecision,
-        analytics: consentStore.analytics,
-        marketing: consentStore.marketing,
-      });
+        // Shopify API loaded and state synced
+      }, 300); // Give extra time for any pending saves to complete
     }
   }, 100);
 
@@ -254,28 +260,48 @@ function checkShopifyAPI() {
   }, 10000);
 }
 
-function acceptAll() {
-  // Update store state
+async function acceptAll() {
+  // Update local toggles first
+  analyticsConsent.value = true;
+  marketingConsent.value = true;
+
+  // Update store state (this will dismiss the banner)
   consentStore.acceptAll();
 
-  // Set consent in Shopify API
-  setConsent(consentStore.consentSettings);
-
-  console.log("[Cookie Banner] User accepted all cookies");
+  try {
+    // Set consent in Shopify API and wait for confirmation
+    const result = await setConsent(consentStore.consentSettings);
+    // User accepted all cookies
+  } catch (error) {
+    console.error(
+      "[Cookie Banner] Failed to save accept all to Shopify:",
+      error
+    );
+  }
 }
 
-function rejectAll() {
-  // Update store state
+async function rejectAll() {
+  // Update local toggles first
+  analyticsConsent.value = false;
+  marketingConsent.value = false;
+
+  // Update store state (this will dismiss the banner)
   consentStore.rejectAll();
 
-  // Set consent in Shopify API
-  setConsent(consentStore.consentSettings);
-
-  console.log("[Cookie Banner] User rejected all cookies");
+  try {
+    // Set consent in Shopify API and wait for confirmation
+    const result = await setConsent(consentStore.consentSettings);
+    // User rejected all cookies
+  } catch (error) {
+    console.error(
+      "[Cookie Banner] Failed to save reject all to Shopify:",
+      error
+    );
+  }
 }
 
-function savePreferences() {
-  // Save preferences to store
+async function savePreferences() {
+  // Save local toggle values to store (this will dismiss the banner)
   consentStore.savePreferences({
     analytics: analyticsConsent.value,
     marketing: marketingConsent.value,
@@ -283,82 +309,229 @@ function savePreferences() {
     sale_of_data: marketingConsent.value, // Link to marketing for simplicity
   });
 
-  // Set consent in Shopify API
-  setConsent(consentStore.consentSettings);
+  try {
+    // Set consent in Shopify API and wait for confirmation
+    const result = await setConsent({
+      analytics: analyticsConsent.value,
+      marketing: marketingConsent.value,
+      preferences: analyticsConsent.value,
+      sale_of_data: marketingConsent.value,
+    });
 
-  console.log("[Cookie Banner] User saved custom preferences:", {
-    analytics: analyticsConsent.value,
-    marketing: marketingConsent.value,
-  });
+    // User saved custom preferences
+  } catch (error) {
+    console.error(
+      "[Cookie Banner] Failed to save preferences to Shopify:",
+      error
+    );
+  }
 }
 
 function updateAnalyticsConsent() {
-  // Real-time update without saving (until user clicks Save)
-  console.log(
-    "[Cookie Banner] Analytics consent toggled:",
-    analyticsConsent.value
-  );
+  // Only update the toggle state, don't save or dismiss banner yet
+  // The store will be updated via the computed property binding
+  // Analytics consent toggled
 }
 
 function updateMarketingConsent() {
-  // Real-time update without saving (until user clicks Save)
-  console.log(
-    "[Cookie Banner] Marketing consent toggled:",
-    marketingConsent.value
-  );
+  // Only update the toggle state, don't save or dismiss banner yet
+  // The store will be updated via the computed property binding
+  // Marketing consent toggled
 }
 
 function setConsent(consent) {
   if (!window.Shopify?.customerPrivacy) {
     console.error("[Cookie Banner] Shopify Customer Privacy API not available");
-    return;
+    return Promise.reject(new Error("Shopify API not available"));
   }
 
-  try {
-    // Set consent using Shopify's API
-    window.Shopify.customerPrivacy.setTrackingConsent(consent, () => {
-      console.log("[Cookie Banner] Consent updated successfully");
+  return new Promise((resolve, reject) => {
+    try {
+      // Saving consent to Shopify
 
-      // Update analytics context
-      if (analytics.value?.canTrack?.value) {
-        // Trigger a re-evaluation of the canTrack function
-        const newCanTrack = () => {
+      // Set consent using Shopify's API
+      window.Shopify.customerPrivacy.setTrackingConsent(consent, (result) => {
+        if (result?.error) {
+          console.error(
+            "[Cookie Banner] Shopify consent save failed:",
+            result.error
+          );
+          reject(new Error(result.error));
+          return;
+        }
+
+        // Consent saved to Shopify successfully
+
+        // Wait a moment for Shopify to process, then verify the save worked
+        setTimeout(() => {
           try {
-            return (
-              window.Shopify?.customerPrivacy?.analyticsProcessingAllowed() ??
-              false
+            const savedAnalytics =
+              window.Shopify.customerPrivacy.analyticsProcessingAllowed?.() ??
+              false;
+            const savedMarketing =
+              window.Shopify.customerPrivacy.marketingAllowed?.() ?? false;
+
+            // Check Shopify's regional and merchant settings
+            const shouldShowBanner =
+              window.Shopify.customerPrivacy.shouldShowBanner?.() ?? false;
+            const customerRegion =
+              window.Shopify.customerPrivacy.getRegion?.() ?? "unknown";
+            const currentConsent =
+              window.Shopify.customerPrivacy.currentVisitorConsent?.() ?? {};
+
+            // Verified Shopify consent state
+
+            // Check if save actually worked
+            const analyticsMatch = savedAnalytics === consent.analytics;
+            const marketingMatch = savedMarketing === consent.marketing;
+
+            if (!analyticsMatch || !marketingMatch) {
+              // Check for store-level overrides
+              const storeOverridesMarketing =
+                consent.marketing === false && savedMarketing === true;
+              const storeOverridesAnalytics =
+                consent.analytics === false && savedAnalytics === true;
+
+              if (storeOverridesMarketing || storeOverridesAnalytics) {
+                console.warn(
+                  "[Cookie Banner] 🏪 Store-level privacy settings detected!",
+                  {
+                    message:
+                      "Your Shopify store has privacy settings that override user consent choices.",
+                    analytics: {
+                      sent: consent.analytics,
+                      received: savedAnalytics,
+                      storeOverride: storeOverridesAnalytics,
+                    },
+                    marketing: {
+                      sent: consent.marketing,
+                      received: savedMarketing,
+                      storeOverride: storeOverridesMarketing,
+                    },
+                    possibleCauses: [
+                      "Store configured to require marketing consent in your region",
+                      "Regional privacy laws overriding user choice",
+                      "Merchant settings forcing consent to 'on' for compliance",
+                    ],
+                    region: customerRegion,
+                    recommendation:
+                      "Check Shopify Admin → Settings → Customer Privacy → Regional Settings",
+                  }
+                );
+
+                // Update local store to match what Shopify actually enforces
+                consentStore.$patch({
+                  analytics: savedAnalytics,
+                  marketing: savedMarketing,
+                });
+
+                // Updated local store to match Shopify store settings
+                resolve({
+                  consent,
+                  savedAnalytics,
+                  savedMarketing,
+                  storeOverride: true,
+                });
+                return;
+              }
+
+              console.warn(
+                "[Cookie Banner] ⚠️ Shopify save verification failed!",
+                {
+                  analytics: {
+                    sent: consent.analytics,
+                    received: savedAnalytics,
+                    match: analyticsMatch,
+                  },
+                  marketing: {
+                    sent: consent.marketing,
+                    received: savedMarketing,
+                    match: marketingMatch,
+                  },
+                }
+              );
+
+              // Try saving again with minimal fields approach
+              // Retrying save with minimal consent object
+              setTimeout(() => {
+                // Try with just the essential fields
+                const minimalConsent = {
+                  analytics: consent.analytics,
+                  marketing: consent.marketing,
+                };
+
+                // Retry with minimal consent
+
+                // Call the original Shopify API directly (not our overridden version)
+                window.Shopify.customerPrivacy.setTrackingConsent(
+                  minimalConsent,
+                  (retryResult) => {
+                    // Retry save completed
+
+                    // Verify this attempt too
+                    setTimeout(() => {
+                      const reVerifyAnalytics =
+                        window.Shopify.customerPrivacy.analyticsProcessingAllowed?.() ??
+                        false;
+                      const reVerifyMarketing =
+                        window.Shopify.customerPrivacy.marketingAllowed?.() ??
+                        false;
+
+                      // Re-verification completed
+                    }, 300);
+                  }
+                );
+              }, 100);
+            }
+
+            // Update analytics context
+            if (analytics.value?.canTrack?.value) {
+              const newCanTrack = () => {
+                try {
+                  return savedAnalytics;
+                } catch (e) {
+                  return false;
+                }
+              };
+              analytics.value.canTrack.value = newCanTrack;
+
+              console.log(
+                "[Cookie Banner] Analytics context updated, canTrack:",
+                newCanTrack()
+              );
+            }
+
+            // Dispatch a consent change event for other components
+            if (typeof window !== "undefined") {
+              window.dispatchEvent(
+                new CustomEvent("consentChanged", {
+                  detail: { consent, timestamp: Date.now() },
+                })
+              );
+            }
+
+            resolve({ consent, savedAnalytics, savedMarketing });
+          } catch (verifyError) {
+            console.error(
+              "[Cookie Banner] Failed to verify consent save:",
+              verifyError
             );
-          } catch (e) {
-            return false;
+            reject(verifyError);
           }
-        };
-        analytics.value.canTrack.value = newCanTrack;
-
-        console.log(
-          "[Cookie Banner] Analytics context updated, canTrack:",
-          newCanTrack()
-        );
-      }
-
-      // Dispatch a consent change event for other components
-      if (typeof window !== "undefined") {
-        window.dispatchEvent(
-          new CustomEvent("consentChanged", {
-            detail: { consent, timestamp: Date.now() },
-          })
-        );
-      }
-    });
-  } catch (error) {
-    console.error("[Cookie Banner] Failed to set consent:", error);
-  }
+        }, 500); // Give Shopify more time to process the save
+      });
+    } catch (error) {
+      console.error("[Cookie Banner] Failed to set consent:", error);
+      reject(error);
+    }
+  });
 }
 
 // Listen for privacy API changes
 onMounted(() => {
   if (typeof window !== "undefined") {
     window.addEventListener("consentChanged", (event) => {
-      console.log("[Cookie Banner] Consent changed:", event.detail);
+      // Consent changed event received
     });
   }
 });
@@ -379,6 +552,14 @@ if (process.dev) {
       isReady: isReady.value,
       showBanner: showBanner.value,
       shouldShowBanner: consentStore.shouldShowBanner,
+      currentToggles: {
+        analytics: analyticsConsent.value,
+        marketing: marketingConsent.value,
+      },
+      savedConsent: {
+        analytics: consentStore.analytics,
+        marketing: consentStore.marketing,
+      },
     }),
   };
 }

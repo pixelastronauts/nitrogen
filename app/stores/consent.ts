@@ -49,7 +49,7 @@ export const useConsentStore = defineStore('@nitrogen/consent', {
         if (stored) {
           const data = JSON.parse(stored)
           this.$patch(data)
-          console.log('[Consent Store] Loaded consent from localStorage:', data)
+          // Loaded consent from localStorage
         }
       } catch (error) {
         console.error('[Consent Store] Failed to load from localStorage:', error)
@@ -63,7 +63,7 @@ export const useConsentStore = defineStore('@nitrogen/consent', {
       try {
         const state = this.$state
         localStorage.setItem('@nitrogen/consent', JSON.stringify(state))
-        console.log('[Consent Store] Saved consent to localStorage:', state)
+        // Saved consent to localStorage
       } catch (error) {
         console.error('[Consent Store] Failed to save to localStorage:', error)
       }
@@ -80,7 +80,7 @@ export const useConsentStore = defineStore('@nitrogen/consent', {
         lastUpdated: Date.now(),
       })
       this.persistToStorage()
-      console.log('[Consent Store] User accepted all cookies')
+      // User accepted all cookies
     },
 
     // Reject all cookies
@@ -94,7 +94,7 @@ export const useConsentStore = defineStore('@nitrogen/consent', {
         lastUpdated: Date.now(),
       })
       this.persistToStorage()
-      console.log('[Consent Store] User rejected all cookies')
+      // User rejected all cookies
     },
 
     // Save custom preferences
@@ -108,10 +108,10 @@ export const useConsentStore = defineStore('@nitrogen/consent', {
         lastUpdated: Date.now(),
       })
       this.persistToStorage()
-      console.log('[Consent Store] User saved custom preferences:', settings)
+      // User saved custom preferences
     },
 
-    // Update consent from Shopify API
+    // Update consent from Shopify API (Shopify is now the source of truth)
     syncFromShopifyAPI() {
       if (typeof window === 'undefined' || !window.Shopify?.customerPrivacy) return
 
@@ -119,17 +119,16 @@ export const useConsentStore = defineStore('@nitrogen/consent', {
         const analyticsAllowed = window.Shopify.customerPrivacy.analyticsProcessingAllowed?.() ?? false
         const marketingAllowed = window.Shopify.customerPrivacy.marketingAllowed?.() ?? false
 
-        // Update state with current consent
+        // Sync from Shopify as it's the source of truth
+        // Our banner now properly saves to Shopify, so this keeps everything in sync
         this.$patch({
           analytics: analyticsAllowed,
           marketing: marketingAllowed,
           preferences: analyticsAllowed, // Link to analytics
           saleOfData: marketingAllowed, // Link to marketing
         })
-        console.log('[Consent Store] Synced from Shopify API:', {
-          analytics: analyticsAllowed,
-          marketing: marketingAllowed,
-        })
+        
+        // Synced from Shopify API
       } catch (error) {
         console.error('[Consent Store] Failed to sync from Shopify API:', error)
       }
@@ -150,7 +149,7 @@ export const useConsentStore = defineStore('@nitrogen/consent', {
         localStorage.removeItem('@nitrogen/consent')
       }
       
-      console.log('[Consent Store] Reset consent state')
+      // Reset consent state
     },
   },
 }) 

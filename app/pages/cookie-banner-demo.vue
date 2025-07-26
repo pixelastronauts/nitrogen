@@ -8,8 +8,11 @@
           <!-- Current Status -->
           <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
             <h2 class="text-lg font-semibold mb-3 text-blue-900">
-              📊 Current Consent Status
+              📊 Current Banner State
             </h2>
+            <p class="text-xs text-blue-700 mb-3">
+              Shows live toggle state (may not be saved yet)
+            </p>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
               <div>
                 <div class="space-y-2">
@@ -138,7 +141,7 @@
 </template>
 
 <script setup>
-import { ref, computed, watch } from "vue";
+import { ref, computed, watch, onMounted } from "vue";
 import { useConsentStore } from "~/stores/consent";
 
 const analyticsAllowed = ref(false);
@@ -172,6 +175,21 @@ watch(
   },
   { immediate: true }
 );
+
+// Load status on mount, then only refresh manually
+onMounted(() => {
+  refreshStatus();
+});
+
+// Watch consent store for reactive updates (without spamming logs)
+watch(
+  () => [consentStore.analytics, consentStore.marketing],
+  ([newAnalytics, newMarketing]) => {
+    // Update display values reactively
+    analyticsAllowed.value = newAnalytics;
+    marketingAllowed.value = newMarketing;
+  }
+);
 const testEventResult = ref("");
 
 // Get analytics context
@@ -189,24 +207,44 @@ onMounted(() => {
 });
 
 function refreshStatus() {
-  if (typeof window !== "undefined" && window.Shopify?.customerPrivacy) {
-    analyticsAllowed.value =
-      window.Shopify.customerPrivacy.analyticsProcessingAllowed?.() ?? false;
-    marketingAllowed.value =
-      window.Shopify.customerPrivacy.marketingAllowed?.() ?? false;
-    saleOfDataAllowed.value =
-      window.Shopify.customerPrivacy.saleOfDataAllowed?.() ?? false;
+  if (typeof window !== "undefined") {
+    // Get current banner toggle state if available
+    const bannerState = window.__cookieBanner?.getState?.();
 
-    // canTrack is now a computed property, no need to manually update
+    if (bannerState?.currentToggles) {
+      // Show current banner toggle state (live, may not be saved yet)
+      analyticsAllowed.value = bannerState.currentToggles.analytics;
+      marketingAllowed.value = bannerState.currentToggles.marketing;
+    } else if (window.Shopify?.customerPrivacy) {
+      // Fallback to Shopify API for saved state
+      analyticsAllowed.value =
+        window.Shopify.customerPrivacy.analyticsProcessingAllowed?.() ?? false;
+      marketingAllowed.value =
+        window.Shopify.customerPrivacy.marketingAllowed?.() ?? false;
+    }
 
-    console.log("[Cookie Demo] Status refreshed:", {
-      analyticsAllowed: analyticsAllowed.value,
-      marketingAllowed: marketingAllowed.value,
-      saleOfDataAllowed: saleOfDataAllowed.value,
-      canTrack: canTrack.value,
-    });
+    // Sale of data always from Shopify API (not in our toggle system)
+    if (window.Shopify?.customerPrivacy) {
+      saleOfDataAllowed.value =
+        window.Shopify.customerPrivacy.saleOfDataAllowed?.() ?? false;
+    }
+
+    // Only log when manually refreshed (not auto-spam)
+    if (console.groupCollapsed) {
+      console.groupCollapsed("[Cookie Demo] Status refreshed");
+      console.log("Analytics:", analyticsAllowed.value ? "✅" : "❌");
+      console.log("Marketing:", marketingAllowed.value ? "✅" : "❌");
+      console.log("Can Track:", canTrack.value ? "✅" : "❌");
+      console.log(
+        "Source:",
+        bannerState?.currentToggles ? "banner-toggles" : "shopify-api"
+      );
+      console.groupEnd();
+    }
   } else {
-    console.warn("[Cookie Demo] Shopify Customer Privacy API not available");
+    console.warn(
+      "[Cookie Demo] Neither banner state nor Shopify API available"
+    );
   }
 }
 
