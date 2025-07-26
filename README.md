@@ -24,6 +24,7 @@ Nitrogen is a Nuxt template inspired by Shopify's [Hydrogen](https://github.com/
 - 🌐 Shop localization
 - 💡 Sitemap, with robots
 - 📫 Klaviyo integration
+- 📊 **Shopify Analytics integration**
 - 🎠 Embla Carousel
 - 🎨 Tailwind v4
 - 🔮 Codegen
@@ -45,6 +46,10 @@ NUXT_SHOPIFY_DOMAIN=your-shop-name.myshopify.com
 NUXT_SHOPIFY_ADMIN_ACCESS_TOKEN=your_admin_access_token
 NUXT_SHOPIFY_STOREFRONT_ACCESS_TOKEN=your_storefront_access_token
 NUXT_SHOPIFY_API_VERSION=2025-01
+
+# Shopify Analytics (optional)
+NUXT_SHOPIFY_CHECKOUT_DOMAIN=your-shop-name.myshopify.com
+NUXT_ANALYTICS_COOKIE_DOMAIN=yourdomain.com
 
 # Klaviyo (optional)
 NUXT_KLAVIYO_PUBLIC_API_KEY=your_public_api_key
@@ -70,7 +75,7 @@ NUXT_SANITY_API_READ_TOKEN=your_api_read_token
 
 ## ⚡ Basic Usage
 
-Nitrogen features two custom modules for [Shopify](https://github.com/rylanharper/nitrogen/blob/master/modules/shopify) and [Klaviyo](https://github.com/rylanharper/nitrogen/blob/master/modules/klaviyo), located in the `/modules` folder. The Shopify module, in particular, lets you connect to both the Storefront API and Admin API at the same time, which is ideal for building complex storefronts that may use Shopify to act a database in some way (think wishlist functionality or unique customer account features).
+Nitrogen features custom modules for [Shopify](https://github.com/rylanharper/nitrogen/blob/master/modules/shopify), [Analytics](https://github.com/rylanharper/nitrogen/blob/master/modules/analytics), and [Klaviyo](https://github.com/rylanharper/nitrogen/blob/master/modules/klaviyo), located in the `/modules` folder. The Shopify module, in particular, lets you connect to both the Storefront API and Admin API at the same time, which is ideal for building complex storefronts that may use Shopify to act a database in some way (think wishlist functionality or unique customer account features).
 
 > [!TIP]
 > Read the official Nuxt Author Module Guide to learn how to create and manage your own modules!
@@ -90,7 +95,7 @@ This project includes pre-built GraphQL [operations](https://github.com/rylanhar
 To get GraphQL operations, use the `useShopify` composable:
 
 ```ts
-const shopify = useShopify()
+const shopify = useShopify();
 ```
 
 Operations can be referenced using this composable with dot notation:
@@ -110,23 +115,23 @@ Perfect for reactive data fetching in pages or components:
 
 ```ts
 // Shopify
-const shopify = useShopify()
+const shopify = useShopify();
 
 // Fetch Shopify data
 const productVars = computed<ProductQueryVariables>(() => ({
   handle: handle.value,
   country: shopStore.buyerCountryCode,
   language: shopStore.buyerLanguageCode,
-}))
+}));
 
 const { data: productData } = await useAsyncData(
   `product-${handle.value}`,
   () => shopify.product.get(productVars.value),
-  { watch: [productVars] },
-)
+  { watch: [productVars] }
+);
 
 // Response data
-const product = computed(() => productData.value)
+const product = computed(() => productData.value);
 ```
 
 ### With `Pinia`
@@ -160,12 +165,98 @@ actions: {
 }
 ```
 
+## 📊 Analytics
+
+Nitrogen includes a comprehensive analytics system inspired by Hydrogen's analytics architecture. It provides automatic tracking for page views, product views, cart events, and more, with built-in Shopify Analytics integration and customer privacy compliance.
+
+### Analytics Setup
+
+The analytics system is automatically configured when you add the required environment variables. It includes:
+
+- **Automatic Page Tracking**: Tracks page views, product views, collection views, and search events
+- **Cart Analytics**: Automatically detects cart changes and tracks add/remove events
+- **Privacy Compliance**: Integrates with Shopify's Customer Privacy API for GDPR/CCPA compliance
+- **Cookie Management**: Manages Shopify analytics cookies (`shopify_Y` and `shopify_S`)
+
+### Analytics Components
+
+Use these components in your templates to track specific events:
+
+```vue
+<!-- Product Page -->
+<AnalyticsProductView
+  :data="{
+    products: [
+      {
+        id: product.id,
+        title: product.title,
+        price: selectedVariant?.price?.amount || '0',
+        vendor: product.vendor,
+        variantId: selectedVariant?.id || '',
+        variantTitle: selectedVariant?.title || '',
+        quantity: 1,
+      },
+    ],
+  }"
+/>
+
+<!-- Collection Page -->
+<AnalyticsCollectionView
+  :data="{
+    collection: {
+      id: collection.id,
+      handle: collection.handle,
+    },
+  }"
+/>
+
+<!-- Search Page -->
+<AnalyticsSearchView
+  :data="{
+    searchTerm: searchTerm,
+    searchResults: searchResults,
+  }"
+/>
+
+<!-- Cart Page -->
+<AnalyticsCartView />
+
+<!-- Custom Events -->
+<AnalyticsCustomView
+  event="custom_newsletter_signup"
+  :data="{ email: userEmail }"
+/>
+```
+
+### Analytics Composable
+
+Access the analytics system programmatically:
+
+```ts
+const analytics = useAnalytics();
+
+// Check if tracking is enabled
+const canTrack = analytics.canTrack.value();
+
+// Publish custom events
+analytics.publish("custom_event", {
+  eventName: "button_clicked",
+  buttonName: "subscribe",
+});
+
+// Subscribe to events (for custom integrations)
+analytics.subscribe("product_viewed", (payload) => {
+  // Send to Google Analytics, etc.
+  console.log("Product viewed:", payload);
+});
+```
+
 ## 🌱 Contribute
 
-Contributions are always welcome! If you’d like to help improve this project, here’s how you can get involved:
+Contributions are always welcome! If you'd like to help improve this project, here's how you can get involved:
 
 - Post an issue: Use the [Issues tab](https://github.com/rylanharper/nitrogen/issues) to report bugs or request new features.
 - Start a discussion: Share ideas or ask for help in the [Discussions tab](https://github.com/rylanharper/nitrogen/discussions).
-- Submit a pull request: If you’d like to contribute, fork the repository, make your changes, and submit a pull request for review.
+- Submit a pull request: If you'd like to contribute, fork the repository, make your changes, and submit a pull request for review.
 
-I actively monitor this repository and will do my best to respond quickly. Whether it’s fixing a small typo or adding a new feature, every contribution helps!
+I actively monitor this repository and will do my best to respond quickly. Whether it's fixing a small typo or adding a new feature, every contribution helps!

@@ -12,13 +12,29 @@ export default defineNuxtConfig({
     '@nuxt/fonts',
     '@nuxt/eslint',
     '@nuxthub/core',
+    './modules/analytics',
   ],
 
-  shopify: {
-    domain: process.env.NUXT_SHOPIFY_DOMAIN,
-    apiVersion: process.env.NUXT_SHOPIFY_API_VERSION,
-    adminAccessToken: process.env.NUXT_SHOPIFY_ADMIN_ACCESS_TOKEN,
-    storefrontAccessToken: process.env.NUXT_SHOPIFY_STOREFRONT_ACCESS_TOKEN,
+  runtimeConfig: {
+    // Server-side config
+    shopify: {
+      adminAccessToken: process.env.NUXT_SHOPIFY_ADMIN_ACCESS_TOKEN,
+    },
+    
+    // Client-side config (exposed to browser)
+    public: {
+      shopify: {
+        domain: process.env.NUXT_SHOPIFY_DOMAIN,
+        apiVersion: process.env.NUXT_SHOPIFY_API_VERSION,
+        storefrontAccessToken: process.env.NUXT_SHOPIFY_STOREFRONT_ACCESS_TOKEN,
+      },
+      analytics: {
+        checkoutDomain: process.env.NUXT_SHOPIFY_CHECKOUT_DOMAIN,
+        storefrontAccessToken: process.env.NUXT_SHOPIFY_STOREFRONT_ACCESS_TOKEN,
+        withPrivacyBanner: false,
+        cookieDomain: process.env.NUXT_ANALYTICS_COOKIE_DOMAIN,
+      },
+    },
   },
 
   klaviyo: {

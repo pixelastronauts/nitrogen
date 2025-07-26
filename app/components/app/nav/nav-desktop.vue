@@ -1,47 +1,47 @@
 <script setup lang="ts">
 // Links
 const navLinksLeft = [
-  { label: 'Shop', path: '/collections/latest' },
-  { label: 'Catalog', path: '/collections/latest' },
-  { label: 'About', path: '/collections/latest' },
-]
+  { label: "Shop", path: "/collections/design-entreematten-op-maat" },
+  { label: "Catalog", path: "/collections/latest" },
+  { label: "About", path: "/collections/latest" },
+];
 
-const navLinksRight = [
-  { label: 'Account', path: '/account' },
-]
+const navLinksRight = [{ label: "Account", path: "/account" }];
 
 // Stores
-const cartStore = useCartStore()
-const shopStore = useShopStore()
+const cartStore = useCartStore();
+const shopStore = useShopStore();
 
 // Computed
-const countryCode = computed(() => shopStore.buyerCountryCode)
-const currencySymbol = computed(() => shopStore.buyerCurrencySymbol)
-const cartTotalItems = computed(() => cartStore.lineItemCount)
+const countryCode = computed(() => shopStore.buyerCountryCode);
+const currencySymbol = computed(() => shopStore.buyerCurrencySymbol);
+const cartTotalItems = computed(() => cartStore.lineItemCount);
 
 // Emits
 const emit = defineEmits<{
-  toggleLocaleModal: []
-  toggleSearchMenu: []
-  toggleCartDrawer: []
-}>()
+  toggleLocaleModal: [];
+  toggleSearchMenu: [];
+  toggleCartDrawer: [];
+}>();
 
 // Emit events
 const toggleLocaleModal = () => {
-  emit('toggleLocaleModal')
-}
+  emit("toggleLocaleModal");
+};
 
 const toggleSearchMenu = () => {
-  emit('toggleSearchMenu')
-}
+  emit("toggleSearchMenu");
+};
 
 const toggleCartDrawer = () => {
-  emit('toggleCartDrawer')
-}
+  emit("toggleCartDrawer");
+};
 </script>
 
 <template>
-  <nav class="hidden grid-cols-[1fr_max-content_1fr] min-h-(--header-height) px-4 lg:grid">
+  <nav
+    class="hidden grid-cols-[1fr_max-content_1fr] min-h-(--header-height) px-4 lg:grid"
+  >
     <div class="grid grid-flow-col justify-start items-center">
       <NuxtLink
         v-for="link in navLinksLeft"
