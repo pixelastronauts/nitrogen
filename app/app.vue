@@ -1,8 +1,13 @@
 <script setup lang="ts">
-const shopStore = useShopStore();
 const cartStore = useCartStore();
+const { initializeLocale, i18nLocale } = useLocale();
 
-await Promise.all([shopStore.getLocalization(), cartStore.getCart()]);
+// Initialize locale system and cart on app startup
+try {
+  await Promise.all([initializeLocale(), (cartStore as any).getCart()]);
+} catch (error) {
+  console.warn("Failed to initialize app:", error);
+}
 
 useHead({
   titleTemplate: (title) =>
@@ -20,7 +25,7 @@ useHead({
     { rel: "preconnect", href: "https://cdn.shopify.com" },
   ],
   htmlAttrs: {
-    lang: "en",
+    lang: i18nLocale,
   },
 });
 </script>

@@ -12,8 +12,46 @@ export default defineNuxtConfig({
     '@nuxt/fonts',
     '@nuxt/eslint',
     '@nuxthub/core',
+    '@nuxtjs/i18n',
     './modules/analytics',
   ],
+
+  i18n: {
+    langDir: 'locales',
+    defaultLocale: 'nl',
+    strategy: 'prefix_except_default',
+    detectBrowserLanguage: {
+      useCookie: true,
+      cookieKey: 'i18n_redirected',
+      redirectOn: 'root'
+    },
+    locales: [
+      {
+        code: 'nl',
+        iso: 'NL',
+        name: 'Nederlands',
+        file: 'nl.json'
+      },
+      {
+        code: 'en',
+        iso: 'EN',
+        name: 'English',
+        file: 'en.json'
+      },
+      {
+        code: 'es',
+        iso: 'ES', 
+        name: 'Español',
+        file: 'es.json'
+      },
+      {
+        code: 'fr',
+        iso: 'FR',
+        name: 'Français',
+        file: 'fr.json'
+      }
+    ]
+  },
 
   runtimeConfig: {
     // Server-side config

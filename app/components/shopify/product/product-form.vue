@@ -1,23 +1,26 @@
 <script setup lang="ts">
-import type { ProductFragment, ProductVariantFragment } from '@@/types/shopify-storefront'
+import type {
+  ProductFragment,
+  ProductVariantFragment,
+} from "@@/types/shopify-storefront";
 
-import { isSizeOption } from '@/helpers/shopify'
-import { formatVariantId } from '@/utils/formatters'
+import { isSizeOption } from "@/helpers/shopify";
+import { formatVariantId } from "@/utils/formatters";
 
 // Props
 const props = defineProps<{
-  product: ProductFragment
-  variants: ProductVariantFragment[]
-  matchingColors: ProductFragment[]
-}>()
+  product: ProductFragment;
+  variants: ProductVariantFragment[];
+  matchingColors: ProductFragment[];
+}>();
 
 // Route data
-const route = useRoute()
-const router = useRouter()
-const variantQuery = computed(() => route.query.variant as string | undefined)
+const route = useRoute();
+const router = useRouter();
+const variantQuery = computed(() => route.query.variant as string | undefined);
 
 // State
-const selectedSize = ref('')
+const selectedSize = ref("");
 
 // Computed
 const currentVariant = computed(() =>
@@ -26,66 +29,86 @@ const currentVariant = computed(() =>
       isSizeOption(name) ? value === selectedSize.value : true,
     ),
   ),
-)
+);
+
+// Check if this is a mat product that needs the configurator
+const isMatProduct = computed(() => {
+  const tags = props.product.tags || [];
+
+  // Only check for "Made to order" tag
+  return tags.some((tag) => {
+    const tagLower = tag.toLowerCase().trim();
+    return tagLower === "made to order";
+  });
+});
 
 // Set formatted variant ID to URL
 const setVariantId = (variant: ProductVariantFragment | undefined) => {
-  const query = { ...route.query }
+  const query = { ...route.query };
 
   if (variant) {
-    query.variant = formatVariantId(variant.id)
+    query.variant = formatVariantId(variant.id);
   } else {
-    delete query.variant
+    delete query.variant;
   }
 
-  router.replace({ query })
-}
+  router.replace({ query });
+};
 
 // Set initial variant from URL or default to first
 // Defaults to undefined if no match is found
 onMounted(() => {
-  let initialVariant: ProductVariantFragment | undefined
+  let initialVariant: ProductVariantFragment | undefined;
 
   if (props.variants.length === 1) {
-    initialVariant = props.variants[0]
+    initialVariant = props.variants[0];
   } else if (variantQuery.value) {
-    initialVariant = props.variants.find((value) => formatVariantId(value.id) === variantQuery.value)
+    initialVariant = props.variants.find(
+      (value) => formatVariantId(value.id) === variantQuery.value,
+    );
   }
 
   if (initialVariant) {
-    const sizeOption = initialVariant.selectedOptions.find((option) => isSizeOption(option.name))
-    if (sizeOption) selectedSize.value = sizeOption.value
-    setVariantId(initialVariant)
+    const sizeOption = initialVariant.selectedOptions.find((option) =>
+      isSizeOption(option.name),
+    );
+    if (sizeOption) selectedSize.value = sizeOption.value;
+    setVariantId(initialVariant);
   }
-})
+});
 
 // Actions
 const setSizeOption = (size: string) => {
-  selectedSize.value = size
-}
+  selectedSize.value = size;
+};
 
 // Watchers
-watch(currentVariant, setVariantId)
+watch(currentVariant, setVariantId);
 </script>
 
 <template>
   <div class="relative lg:sticky lg:top-[calc(var(--header-height)+1px)]">
     <div class="flex flex-col gap-5 w-full lg:md:max-w-lg lg:pt-20 lg:mx-auto">
-      <FormHeader
-        :product="product"
-        :current-variant="currentVariant"
-      />
-      <FormColorOptions
-        :product="product"
-        :matching-colors="matchingColors"
-      />
+      <FormHeader :product="product" :current-variant="currentVariant" />
+      <FormColorOptions :product="product" :matching-colors="matchingColors" />
       <FormSizeOptions
         :product="product"
         :variants="variants"
         :selected-size="selectedSize"
         @set-size-option="setSizeOption"
       />
+
+      <!-- Mat Configurator for custom mat products -->
+      <MatConfigurator
+        v-if="isMatProduct"
+        :product="product"
+        :current-variant="currentVariant"
+        :variants="variants"
+      />
+
+      <!-- Standard Add to Cart for non-mat products -->
       <FormAddToCart
+        v-if="!isMatProduct"
         :current-variant="currentVariant"
         :variants="variants"
       />

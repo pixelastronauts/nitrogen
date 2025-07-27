@@ -1,0 +1,33 @@
+---
+alwaysApply: false
+---
+
+# i18n Rules
+
+## Configuration Rules
+
+- **NEVER edit the `langDir` configuration in `nuxt.config.ts`** - The langDir is already properly configured and should not be modified
+- All locale files are located in `./i18n/locales` directory and should remain there
+- Use the existing locale structure: `en.json`, `es.json`, `fr.json`, `nl.json`
+
+## Translation File Management
+
+- Always maintain consistent key structures across all locale files
+- When adding new translation keys, add them to ALL locale files (en, es, fr, nl)
+- Use nested objects for organized translation keys (e.g., `common.buttons.save`)
+- Keep translation keys descriptive and hierarchical
+
+## Usage Guidelines
+
+- Use `$t('key')` for translations in Vue templates
+- Use `t('key')` for translations in composition API with `useI18n()`
+- Prefer using translation keys over hardcoded strings
+- Use interpolation for dynamic content: `$t('message', { name: 'John' })`
+
+## Best Practices
+
+- Always test translations in all supported locales
+- Keep translation values concise but descriptive
+- Use plural forms when necessary with `$tc()` or the `|` separator
+- Maintain consistent tone and style across all languages
+- Consider cultural context when translating, not just literal translation

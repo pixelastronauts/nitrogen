@@ -314,9 +314,7 @@ watch(
   canTrack,
   (newValue, oldValue) => {
     if (newValue !== oldValue) {
-      console.log(
-        `[Analytics Test] canTrack changed: ${oldValue} → ${newValue}`
-      );
+      // canTrack changed
     }
   },
   { immediate: true }
@@ -366,7 +364,7 @@ onMounted(() => {
       });
     });
 
-    console.log("🔍 Analytics Test Page: Subscribed to all events");
+    // Subscribed to all events
   } else {
     console.error("🚨 Analytics Test Page: Analytics context not available");
   }

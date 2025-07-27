@@ -1,41 +1,46 @@
 <script setup lang="ts">
-import { useCartStore } from '@/stores/cart'
+import { useCartStore } from "@/stores/cart";
+
+// i18n
+const { t } = useI18n();
 
 // Stores
-const cartStore = useCartStore()
+const cartStore = useCartStore();
 
 // Computed
-const cartTotalItems = computed(() => cartStore.lineItemCount)
+const cartTotalItems = computed(() => cartStore.cart?.totalQuantity || 0);
 
 // Emits
 const emit = defineEmits<{
-  toggleMobileMenu: []
-  toggleSearchMenu: []
-  toggleCartDrawer: []
-}>()
+  toggleMobileMenu: [];
+  toggleSearchMenu: [];
+  toggleCartDrawer: [];
+}>();
 
 // Emit events
 const toggleMobileMenu = () => {
-  emit('toggleMobileMenu')
-}
+  emit("toggleMobileMenu");
+};
 
 const toggleSearchMenu = () => {
-  emit('toggleSearchMenu')
-}
+  emit("toggleSearchMenu");
+};
 
 const toggleCartDrawer = () => {
-  emit('toggleCartDrawer')
-}
+  emit("toggleCartDrawer");
+};
 </script>
 
 <template>
-  <nav class="grid grid-cols-[1fr_max-content_1fr] gap-4 min-h-(--header-height) px-4 lg:hidden">
+  <nav
+    class="grid grid-cols-[1fr_max-content_1fr] gap-4 min-h-(--header-height) px-4 lg:hidden"
+  >
     <div class="grid grid-flow-col justify-start items-center">
       <button
         class="flex p-2 text-normalize bg-transparent rounded-full"
         @click="toggleMobileMenu"
       >
-        <span>Menu</span>
+        <span>{{ t("navigation.menu") }}</span>
       </button>
     </div>
     <div class="flex items-center">
@@ -61,7 +66,7 @@ const toggleCartDrawer = () => {
         class="flex p-2 text-normalize bg-transparent rounded-full"
         @click="toggleCartDrawer"
       >
-        <span>Cart ({{ cartTotalItems }})</span>
+        <span>{{ t("navigation.cart") }} ({{ cartTotalItems }})</span>
       </button>
     </div>
   </nav>

@@ -1,21 +1,25 @@
 <script setup lang="ts">
+// i18n
+const { t } = useI18n();
+
 // Links
 const navLinksLeft = [
-  { label: "Shop", path: "/collections/design-entreematten-op-maat" },
-  { label: "Catalog", path: "/collections/latest" },
-  { label: "About", path: "/collections/latest" },
+  {
+    label: t("navigation.shop"),
+    path: "/collections/design-entreematten-op-maat",
+  },
+  { label: t("navigation.collections"), path: "/collections/latest" },
+  { label: t("navigation.about"), path: "/collections/latest" },
 ];
 
-const navLinksRight = [{ label: "Account", path: "/account" }];
+const navLinksRight = [{ label: t("navigation.account"), path: "/account" }];
 
 // Stores
 const cartStore = useCartStore();
 const shopStore = useShopStore();
 
 // Computed
-const countryCode = computed(() => shopStore.buyerCountryCode);
-const currencySymbol = computed(() => shopStore.buyerCurrencySymbol);
-const cartTotalItems = computed(() => cartStore.lineItemCount);
+const cartTotalItems = computed(() => cartStore.cart?.totalQuantity || 0);
 
 // Emits
 const emit = defineEmits<{
@@ -66,7 +70,10 @@ const toggleCartDrawer = () => {
         class="px-2 py-0.5 text-normalize bg-transparent rounded-md transition duration-200 hover:bg-zinc-100"
         @click="toggleLocaleModal"
       >
-        <span>{{ countryCode }} / {{ currencySymbol }}</span>
+        <span
+          >{{ shopStore.locale?.country?.isoCode || "NL" }} /
+          {{ shopStore.locale?.country?.currency?.symbol || "€" }}</span
+        >
       </button>
       <NuxtLink
         v-for="link in navLinksRight"
@@ -80,13 +87,13 @@ const toggleCartDrawer = () => {
         class="px-2 py-0.5 text-normalize bg-transparent rounded-md transition duration-200 hover:bg-zinc-100"
         @click="toggleSearchMenu"
       >
-        <span>Search</span>
+        <span>{{ t("navigation.search") }}</span>
       </button>
       <button
         class="px-2.5 py-0.5 text-normalize bg-transparent rounded-md transition duration-200 hover:bg-zinc-100"
         @click="toggleCartDrawer"
       >
-        <span>Cart ({{ cartTotalItems }})</span>
+        <span>{{ t("navigation.cart") }} ({{ cartTotalItems }})</span>
       </button>
     </div>
   </nav>

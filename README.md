@@ -127,7 +127,7 @@ const productVars = computed<ProductQueryVariables>(() => ({
 const { data: productData } = await useAsyncData(
   `product-${handle.value}`,
   () => shopify.product.get(productVars.value),
-  { watch: [productVars] }
+  { watch: [productVars] },
 );
 
 // Response data

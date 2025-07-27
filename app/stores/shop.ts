@@ -21,10 +21,24 @@ export const useShopStore = defineStore('@nikkoel/shop', {
       availableCountries: [],
       availableLanguages: [],
       country: {
-        isoCode: 'US',
+        isoCode: 'NL',
+        name: 'Netherlands',
+                 unitSystem: 'METRIC' as any,
+        currency: {
+          isoCode: 'EUR',
+          name: 'Euro',
+          symbol: '€',
+        },
+        availableLanguages: [{
+          isoCode: 'NL',
+          name: 'Dutch',
+          endonymName: 'Nederlands',
+        }],
       },
       language: {
-        isoCode: 'EN',
+        isoCode: 'NL',
+        name: 'Dutch',
+        endonymName: 'Nederlands',
       },
     },
   }),
@@ -37,9 +51,13 @@ export const useShopStore = defineStore('@nikkoel/shop', {
      */
     async getLocalization(newCountryCode?: CountryCode, newLanguageCode?: LanguageCode) {
       try {
+        // Use provided params or defaults if store is not initialized
+        const country = newCountryCode || (this.locale?.country?.isoCode) || 'NL'
+        const language = newLanguageCode || (this.locale?.language?.isoCode) || 'NL'
+        
         const response = await shopify.localization.get({
-          country: newCountryCode ?? this.locale.country.isoCode,
-          language: newLanguageCode ?? this.locale.language.isoCode,
+          country: country as any,
+          language: language as any,
         })
 
         if (!response.country && !response.language) {
@@ -50,21 +68,18 @@ export const useShopStore = defineStore('@nikkoel/shop', {
         this.locale.availableLanguages = response.availableLanguages
         this.locale.country = response.country
         this.locale.language = response.language
+
       } catch (error: any) {
-        console.error('Connot get localization data:', error.message)
+        console.error('Cannot get localization data:', error.message)
         throw error
       }
     },
   },
 
   getters: {
-    buyerCountryCode: (state) => state.locale?.country?.isoCode,
-    buyerCurrencyCode: (state) => state.locale?.country?.currency?.isoCode,
-    buyerCurrencySymbol: (state) => state.locale?.country?.currency?.symbol,
-    buyerLanguageCode: (state) => state.locale?.language?.isoCode,
-  },
-
-  persist: {
-    pick: ['locale.country', 'locale.language'],
+    buyerCountryCode: (state) => state.locale?.country?.isoCode || 'NL',
+    buyerCurrencyCode: (state) => state.locale?.country?.currency?.isoCode || 'EUR',
+    buyerCurrencySymbol: (state) => state.locale?.country?.currency?.symbol || '€',
+    buyerLanguageCode: (state) => state.locale?.language?.isoCode || 'NL',
   },
 })

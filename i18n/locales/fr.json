@@ -1,0 +1,97 @@
+{
+  "common": {
+    "loading": "Chargement...",
+    "save": "Enregistrer",
+    "saving": "Enregistrement...",
+    "close": "Fermer",
+    "cancel": "Annuler",
+    "confirm": "Confirmer",
+    "error": "Erreur",
+    "success": "Succès",
+    "warning": "Avertissement"
+  },
+  "navigation": {
+    "home": "Accueil",
+    "collections": "Collections",
+    "products": "Produits",
+    "search": "Rechercher",
+    "cart": "Panier",
+    "account": "Compte",
+    "login": "Se Connecter",
+    "logout": "Se Déconnecter",
+    "shop": "Boutique",
+    "menu": "Menu",
+    "about": "À Propos"
+  },
+  "cart": {
+    "title": "Panier d'Achat",
+    "empty": "Votre panier est vide",
+    "addToCart": "Ajouter au Panier",
+    "removeFromCart": "Retirer du Panier",
+    "quantity": "Quantité",
+    "subtotal": "Sous-total",
+    "total": "Total",
+    "checkout": "Commander",
+    "continueShopping": "Continuer les Achats"
+  },
+  "product": {
+    "price": "Prix",
+    "comparePrice": "Prix de Comparaison",
+    "availability": "Disponibilité",
+    "inStock": "En Stock",
+    "outOfStock": "Rupture de Stock",
+    "variants": "Variantes",
+    "options": "Options",
+    "description": "Description",
+    "details": "Détails",
+    "shipping": "Livraison",
+    "recommendations": "Produits Recommandés"
+  },
+  "locale": {
+    "selectCountry": "Sélectionner le Pays",
+    "selectLanguage": "Sélectionner la Langue",
+    "shopInLocalCurrency": "Achetez dans votre devise locale · Profitez des tarifs d'expédition locaux lors du paiement",
+    "currentLanguage": "Langue Actuelle",
+    "currentCountry": "Pays Actuel"
+  },
+  "account": {
+    "login": "Se Connecter",
+    "register": "S'Inscrire",
+    "logout": "Se Déconnecter",
+    "myAccount": "Mon Compte",
+    "orders": "Commandes",
+    "addresses": "Adresses",
+    "profile": "Profil"
+  },
+  "footer": {
+    "company": "Entreprise",
+    "about": "À Propos",
+    "campaigns": "Campagnes",
+    "contact": "Contact",
+    "support": "Support",
+    "faq": "FAQ",
+    "shippingReturns": "Livraison et Retours",
+    "privacyPolicy": "Politique de Confidentialité",
+    "payments": "Paiements",
+    "connect": "Connecter",
+    "instagram": "Instagram",
+    "tiktok": "TikTok",
+    "github": "GitHub",
+    "newsletter": "Newsletter",
+    "newsletterText": "Restez informé de nos derniers produits et offres",
+    "subscribe": "S'abonner"
+  },
+  "forms": {
+    "email": "Adresse E-mail",
+    "password": "Mot de Passe",
+    "firstName": "Prénom",
+    "lastName": "Nom de Famille",
+    "phone": "Numéro de Téléphone",
+    "address": "Adresse",
+    "city": "Ville",
+    "country": "Pays",
+    "zipCode": "Code Postal",
+    "required": "Ce champ est obligatoire",
+    "invalidEmail": "Adresse e-mail invalide"
+  }
+}

@@ -2,45 +2,49 @@
 import type {
   CustomerQueryVariables,
   OrderFragment,
-} from '@@/types/shopify-storefront'
+} from "@@/types/shopify-storefront";
 
-import { flattenConnection } from '@/utils/graphql'
+import { flattenConnection } from "@/utils/graphql";
 
 // Stores
-const authStore = useAuthStore()
-const shopStore = useShopStore()
+const authStore = useAuthStore();
 
 // Shopify
-const shopify = useShopify()
+const shopify = useShopify();
+
+// Get locale context for queries
+const localeContext = useShopifyLocale();
 
 // Fetch Shopify data
 const customerVars = computed<CustomerQueryVariables>(() => ({
   customerAccessToken: authStore.accessToken,
-  country: shopStore.buyerCountryCode,
-  language: shopStore.buyerLanguageCode,
-}))
+  country: localeContext.country,
+  language: localeContext.language,
+}));
 
 const { data: customerData } = await useAsyncData(
-  'customer-data',
+  "customer-data",
   () => shopify.customer.get(customerVars.value),
   { watch: [customerVars] },
-)
+);
 
 // Response data
-const customer = computed(() => customerData.value)
+const customer = computed(() => customerData.value);
 
 // Access data nodes
-const orders = computed(() => flattenConnection(customer.value?.orders) as OrderFragment[])
+const orders = computed(
+  () => flattenConnection(customer.value?.orders) as OrderFragment[],
+);
 
 // SEO
 useHead({
-  title: 'Orders',
-})
+  title: "Orders",
+});
 
 // Meta
 definePageMeta({
-  layout: 'account',
-})
+  layout: "account",
+});
 </script>
 
 <template>
@@ -52,14 +56,8 @@ definePageMeta({
       <div v-if="orders && orders?.length">
         <AccountOrders :orders="orders" />
       </div>
-      <div
-        v-else
-        class="flex items-center gap-2.5 px-6 lg:p-0"
-      >
-        <Icon
-          name="ph:warning-circle"
-          class="inline-block shrink-0 !size-5"
-        />
+      <div v-else class="flex items-center gap-2.5 px-6 lg:p-0">
+        <Icon name="ph:warning-circle" class="inline-block shrink-0 !size-5" />
         <p>You haven&apos;t placed any orders yet.</p>
       </div>
     </div>

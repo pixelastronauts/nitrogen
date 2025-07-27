@@ -13,9 +13,13 @@
   "dependencies": {
     "@nuxt/fonts": "^0.11.4",
     "@nuxt/icon": "^1.15.0",
+    "@nuxtjs/i18n": "^10.0.3",
     "@nuxtjs/robots": "^5.4.0",
+    "@nuxtjs/sanity": "^1.13.3",
     "@nuxtjs/sitemap": "^7.4.3",
     "@pinia/nuxt": "0.11.2",
+    "@sanity/client": "^7.8.1",
+    "@sanity/vision": "^4.1.1",
     "@vueuse/core": "^13.5.0",
     "@vueuse/nuxt": "^13.5.0",
     "dotenv": "^17.2.0",
@@ -23,7 +27,8 @@
     "graphql": "^16.11.0",
     "graphql-tag": "^2.12.6",
     "pinia": "^3.0.3",
-    "pinia-plugin-persistedstate": "^4.4.1"
+    "pinia-plugin-persistedstate": "^4.4.1",
+    "sanity": "^4.1.1"
   },
   "devDependencies": {
     "@graphql-codegen/cli": "^5.0.7",

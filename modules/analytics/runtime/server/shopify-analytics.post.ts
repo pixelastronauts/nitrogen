@@ -66,7 +66,7 @@ function buildUUID(): string {
     let i = 0;
     const hash = tokenHash
       .replace(/[x]/g, (c: string): string => {
-        const r = randomValuesArray[i] % 16;
+        const r = (randomValuesArray[i] ?? 0) % 16;
         const v = c === 'x' ? r : (r & 0x3) | 0x8;
         i++;
         return v.toString(16);
@@ -100,8 +100,8 @@ const SCHEMA_MAP: Record<string, string> = {
 // Convert camelCase payload to snake_case fields (exactly like Hydrogen)
 function formatPayload(payload: Record<string, unknown>): Record<string, unknown> {
   // Debug logging for unique_token
-  console.log('🔍 [Analytics Debug] payload.uniqueToken:', payload.uniqueToken);
-  console.log('🔍 [Analytics Debug] payload.visitToken:', payload.visitToken);
+  // console.log('🔍 [Analytics Debug] payload.uniqueToken:', payload.uniqueToken);
+  // console.log('🔍 [Analytics Debug] payload.visitToken:', payload.visitToken);
   
   const basePayload = {
     source: payload.shopifySalesChannel || 'headless',
@@ -174,8 +174,8 @@ function formatEventForShopify(event: AnalyticsEvent): ShopifyMonorailEvent {
   };
 
   // Debug logging for final event
-  console.log('🔍 [Analytics Debug] Final event payload unique_token:', (finalEvent.payload as any).unique_token);
-  console.log('🔍 [Analytics Debug] Final event payload deprecated_visit_token:', (finalEvent.payload as any).deprecated_visit_token);
+  // console.log('🔍 [Analytics Debug] Final event payload unique_token:', (finalEvent.payload as any).unique_token);
+  // console.log('🔍 [Analytics Debug] Final event payload deprecated_visit_token:', (finalEvent.payload as any).deprecated_visit_token);
 
   return finalEvent;
 }
@@ -208,12 +208,12 @@ export default defineEventHandler(async (event) => {
     }
 
     // Debug logging (will appear in server console)
-    console.log('🚀 [Analytics] Sending to Shopify:', {
-      endpoint,
-      eventCount: formattedEvents.length,
-      eventTypes: formattedEvents.map(e => e.payload.event_name),
-      timestamp: new Date().toISOString(),
-    })
+    // console.log('🚀 [Analytics] Sending to Shopify:', {
+    //   endpoint,
+    //   eventCount: formattedEvents.length,
+    //   eventTypes: formattedEvents.map(e => e.payload.event_name),
+    //   timestamp: new Date().toISOString(),
+    // })
 
     const response = await $fetch(endpoint, {
       method: 'POST',
@@ -224,12 +224,12 @@ export default defineEventHandler(async (event) => {
     })
 
     // Enhanced response logging
-    console.log('✅ [Analytics] Shopify Response:', {
-      success: true,
-      response: response || 'Empty response (normal)',
-      eventCount: formattedEvents.length,
-      timestamp: new Date().toISOString(),
-    })
+    // console.log('✅ [Analytics] Shopify Response:', {
+    //   success: true,
+    //   response: response || 'Empty response (normal)',
+    //   eventCount: formattedEvents.length,
+    //   timestamp: new Date().toISOString(),
+    // })
 
     return {
       success: true,

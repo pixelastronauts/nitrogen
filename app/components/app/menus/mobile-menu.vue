@@ -1,66 +1,114 @@
 <script setup lang="ts">
-// Links
-const navLinks = [
-  { label: 'Shop', path: '/collections/latest' },
-  { label: 'Catalog', path: '/collections/latest' },
-  { label: 'Account', path: '/account' },
-  { label: 'About', path: '/collections/latest' },
-]
+// i18n
+const { t } = useI18n();
 
 // Stores
-const appStore = useAppStore()
+const appStore = useAppStore();
+
+// Links
+const footerLinks1 = [
+  { label: t("navigation.about"), path: "/collections/latest" },
+  { label: t("footer.campaigns"), path: "/collections/latest" },
+  { label: t("footer.contact"), path: "/collections/latest" },
+];
+
+const footerLinks2 = [
+  { label: t("footer.faq"), path: "/collections/latest" },
+  { label: t("footer.shippingReturns"), path: "/collections/latest" },
+  { label: t("footer.privacyPolicy"), path: "/collections/latest" },
+  { label: t("footer.payments"), path: "/collections/latest" },
+];
+
+const footerLinks3 = [
+  { label: t("footer.instagram"), path: "/collections/latest" },
+  { label: t("footer.tiktok"), path: "/collections/latest" },
+  { label: t("footer.github"), path: "/collections/latest" },
+];
 
 // Actions
-const closeMenu = () => {
-  appStore.toggle('mobileMenu', false)
-}
+const closeMobileMenu = () => {
+  appStore.toggle("mobileMenu", false);
+};
 
 // Watchers
-const route = useRoute()
-const { escape } = useMagicKeys()
+const route = useRoute();
+const { escape } = useMagicKeys();
 
-watch(() => route.path, closeMenu)
+watch(() => route.path, closeMobileMenu);
 
 if (escape) {
-  watch(escape, closeMenu)
+  watch(escape, closeMobileMenu);
 }
 </script>
 
 <template>
   <Transition name="bg-fade">
-    <div
+    <section
       v-if="appStore.mobileMenu"
-      class="fixed inset-0 z-50 bg-black/50 pointer-events-auto"
+      class="fixed inset-0 z-200 bg-black/50 pointer-events-auto lg:hidden"
+      @click="closeMobileMenu"
     />
   </Transition>
-  <Transition name="clip">
-    <aside
+  <Transition name="slide-left">
+    <div
       v-if="appStore.mobileMenu"
-      class="fixed inset-0 size-full z-50 bg-white"
+      class="fixed flex flex-col inset-y-0 start-0 z-200 w-full max-w-sm bg-white border-e border-zinc-200 pointer-events-auto lg:hidden"
     >
-      <div class="flex flex-col size-full px-6">
-        <div class="flex flex-col flex-1 mt-(--header-height) py-6 overflow-y-scroll overflow-x-hidden no-scrollbar">
-          <NuxtLink
-            v-for="link in navLinks"
-            :key="link.label"
-            :to="link.path"
-            class="py-1 text-xl tracking-tight"
-          >
-            <span>{{ link.label }}</span>
-          </NuxtLink>
-        </div>
-        <div class="flex flex-col mb-4">
-          <button
-            class="flex items-center justify-center p-2 px-4 bg-transparent border border-zinc-300 rounded-md"
-            @click="closeMenu"
-          >
-            <span class="text-normalize">
-              Close Menu
-            </span>
-          </button>
+      <div
+        class="flex items-center justify-between p-4 border-b border-zinc-200"
+      >
+        <h2 class="text-lg font-medium">{{ t("navigation.menu") }}</h2>
+        <button @click="closeMobileMenu">
+          <Icon name="ph:x" class="size-6" />
+        </button>
+      </div>
+      <div class="flex-1 overflow-y-auto p-4">
+        <div class="space-y-6">
+          <div>
+            <h3 class="font-medium mb-3">{{ t("footer.company") }}</h3>
+            <nav class="space-y-2">
+              <NuxtLink
+                v-for="link in footerLinks1"
+                :key="link.label"
+                :to="link.path"
+                class="block py-2 text-gray-600 hover:text-gray-900"
+                @click="closeMobileMenu"
+              >
+                {{ link.label }}
+              </NuxtLink>
+            </nav>
+          </div>
+          <div>
+            <h3 class="font-medium mb-3">{{ t("footer.support") }}</h3>
+            <nav class="space-y-2">
+              <NuxtLink
+                v-for="link in footerLinks2"
+                :key="link.label"
+                :to="link.path"
+                class="block py-2 text-gray-600 hover:text-gray-900"
+                @click="closeMobileMenu"
+              >
+                {{ link.label }}
+              </NuxtLink>
+            </nav>
+          </div>
+          <div>
+            <h3 class="font-medium mb-3">{{ t("footer.connect") }}</h3>
+            <nav class="space-y-2">
+              <NuxtLink
+                v-for="link in footerLinks3"
+                :key="link.label"
+                :to="link.path"
+                class="block py-2 text-gray-600 hover:text-gray-900"
+                @click="closeMobileMenu"
+              >
+                {{ link.label }}
+              </NuxtLink>
+            </nav>
+          </div>
         </div>
       </div>
-    </aside>
+    </div>
   </Transition>
 </template>
 
@@ -69,7 +117,7 @@ if (escape) {
 
 .bg-fade-enter-active,
 .bg-fade-leave-active {
-  @apply transition duration-500 ease-out;
+  @apply transition duration-200 ease-out;
 }
 
 .bg-fade-enter-from,
@@ -82,18 +130,18 @@ if (escape) {
   @apply opacity-100;
 }
 
-.clip-enter-active,
-.clip-leave-active {
-  @apply transition-[clip-path] duration-700 ease-[cubic-bezier(0.32,0.72,0,1)];
+.slide-left-enter-active,
+.slide-left-leave-active {
+  @apply transition duration-200 ease-out;
 }
 
-.clip-enter-from,
-.clip-leave-to {
-  clip-path: inset(0% 0% 100% 0%);
+.slide-left-enter-from,
+.slide-left-leave-to {
+  @apply opacity-0 transform -translate-x-full;
 }
 
-.clip-enter-to,
-.clip-leave-from {
-  clip-path: inset(0% 0% 0% 0%);
+.slide-left-enter-to,
+.slide-left-leave-from {
+  @apply opacity-100 transform translate-x-0;
 }
 </style>

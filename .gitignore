@@ -26,3 +26,6 @@ logs
 .env
 .env.*
 !.env.example
+
+# Context files
+for-context/

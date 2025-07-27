@@ -1,0 +1,99 @@
+{
+  "common": {
+    "loading": "Laden...",
+    "save": "Opslaan",
+    "saving": "Opslaan...",
+    "close": "Sluiten",
+    "cancel": "Annuleren",
+    "confirm": "Bevestigen",
+    "error": "Fout",
+    "success": "Succes",
+    "warning": "Waarschuwing",
+    "retry": "Opnieuw proberen"
+  },
+  "navigation": {
+    "about": "Over ons",
+    "home": "Home",
+    "collections": "Collecties",
+    "products": "Producten",
+    "search": "Zoeken",
+    "cart": "Winkelwagen",
+    "account": "Account",
+    "login": "Inloggen",
+    "logout": "Uitloggen",
+    "shop": "Winkel",
+    "menu": "Menu"
+  },
+  "cart": {
+    "title": "Winkelwagen",
+    "empty": "Je winkelwagen is leeg",
+    "addToCart": "Toevoegen aan winkelwagen",
+    "removeFromCart": "Verwijderen uit winkelwagen",
+    "quantity": "Aantal",
+    "subtotal": "Subtotaal",
+    "total": "Totaal",
+    "checkout": "Afrekenen",
+    "continueShopping": "Verder winkelen"
+  },
+  "product": {
+    "price": "Prijs",
+    "comparePrice": "Vergelijk prijs",
+    "availability": "Beschikbaarheid",
+    "inStock": "Op voorraad",
+    "outOfStock": "Niet op voorraad",
+    "variants": "Varianten",
+    "options": "Opties",
+    "description": "Beschrijving",
+    "details": "Details",
+    "shipping": "Verzending",
+    "recommendations": "Aanbevolen producten"
+  },
+  "locale": {
+    "selectCountry": "Selecteer Land",
+    "selectLanguage": "Selecteer Taal",
+    "shopInLocalCurrency": "Shop in je lokale valuta · Geniet van lokale verzendtarieven bij het afrekenen",
+    "currentLanguage": "Huidige taal",
+    "currentCountry": "Huidig land",
+    "noDataAvailable": "Geen locatiegegevens beschikbaar"
+  },
+  "account": {
+    "login": "Inloggen",
+    "register": "Registreren",
+    "logout": "Uitloggen",
+    "myAccount": "Mijn Account",
+    "orders": "Bestellingen",
+    "addresses": "Adressen",
+    "profile": "Profiel"
+  },
+  "footer": {
+    "company": "Bedrijf",
+    "about": "Over ons",
+    "campaigns": "Campagnes",
+    "contact": "Contact",
+    "support": "Ondersteuning",
+    "faq": "Veelgestelde vragen",
+    "shippingReturns": "Verzending & Retour",
+    "privacyPolicy": "Privacybeleid",
+    "payments": "Betalingen",
+    "connect": "Verbinden",
+    "instagram": "Instagram",
+    "tiktok": "TikTok",
+    "github": "GitHub",
+    "newsletter": "Nieuwsbrief",
+    "newsletterText": "Blijf op de hoogte van onze nieuwste producten en aanbiedingen",
+    "subscribe": "Abonneren"
+  },
+  "forms": {
+    "email": "E-mailadres",
+    "password": "Wachtwoord",
+    "firstName": "Voornaam",
+    "lastName": "Achternaam",
+    "phone": "Telefoonnummer",
+    "address": "Adres",
+    "city": "Stad",
+    "country": "Land",
+    "zipCode": "Postcode",
+    "required": "Dit veld is verplicht",
+    "invalidEmail": "Ongeldig e-mailadres"
+  }
+}

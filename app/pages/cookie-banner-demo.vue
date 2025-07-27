@@ -170,7 +170,7 @@ watch(
   canTrack,
   (newValue, oldValue) => {
     if (newValue !== oldValue) {
-      console.log(`[Cookie Demo] canTrack changed: ${oldValue} → ${newValue}`);
+      // canTrack changed
     }
   },
   { immediate: true }
@@ -251,7 +251,7 @@ function refreshStatus() {
 function showCookieBanner() {
   if (typeof window !== "undefined" && window.__cookieBanner) {
     window.__cookieBanner.showBanner();
-    console.log("[Cookie Demo] Cookie banner shown manually");
+    // Cookie banner shown manually
   } else {
     console.warn("[Cookie Demo] Cookie banner controls not available");
   }
@@ -268,7 +268,7 @@ function clearConsent() {
         sale_of_data: false,
       },
       () => {
-        console.log("[Cookie Demo] Consent cleared");
+        // Consent cleared
         setTimeout(() => {
           refreshStatus();
           showCookieBanner();
@@ -315,7 +315,7 @@ async function sendTestEvent() {
       0,
       8
     )}...`;
-    console.log("[Cookie Demo] Test event sent:", response);
+    // Test event sent
   } catch (error) {
     testEventResult.value = `❌ Failed to send event: ${error.message}`;
     console.error("[Cookie Demo] Test event failed:", error);

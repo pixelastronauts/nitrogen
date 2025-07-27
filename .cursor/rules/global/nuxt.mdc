@@ -1,0 +1,84 @@
+---
+alwaysApply: true
+---
+
+# Nuxt 4 Rules
+
+## Framework & Architecture
+
+- Use Nuxt 4's new folder structure with `app/` directory as the main source folder
+- Leverage auto-imports for components, composables, and utilities
+- Use the new `pages/` directory structure for routing
+- Prefer `app.vue` as the main layout wrapper when applicable
+
+## Components
+
+- Place all components in `app/components/` directory
+- Use proper Vue 3 Composition API with `<script setup>`
+- Organize components by feature/domain (e.g., `shopify/`, `klaviyo/`, `app/`)
+- Use TypeScript for all component props and emits
+- Implement proper component naming with PascalCase for multi-word components
+
+## Composables
+
+- Place all composables in `app/composables/` directory
+- Use proper TypeScript typing for composable return values
+- Follow the `use` prefix convention (e.g., `useCurrentVariant`, `useOptimisticCart`)
+- Make composables reactive using `ref`, `reactive`, and `computed`
+- Implement proper error handling within composables
+
+## State Management
+
+- Use Pinia stores in `app/stores/` directory
+- Implement proper TypeScript interfaces for store state
+- Use store composition pattern with actions and getters
+- Avoid Vuex in favor of Pinia for Nuxt 4
+
+## Routing & Pages
+
+- Use file-based routing in `app/pages/` directory
+- Implement proper middleware in `app/middleware/` for route protection
+- Use dynamic routes with square brackets (e.g., `[handle].vue`)
+- Implement proper meta tags and SEO using `useSeoMeta()` or `useHead()`
+
+## Layouts
+
+- Place layouts in `app/layouts/` directory
+- Use `default.vue` as the main layout
+- Implement conditional layouts based on route requirements
+- Keep layouts lightweight and focused on structure
+
+## Server & API
+
+- Use server routes in `server/api/` directory
+- Implement proper error handling in server routes
+- Use Nuxt 4's server utilities for data fetching
+- Prefer server-side data fetching with `$fetch` when appropriate
+
+## Data Fetching
+
+- Use `$fetch` for API calls instead of axios or fetch
+- Implement proper loading states and error handling
+- Use `useLazyFetch` for non-blocking data fetching
+- Leverage server-side rendering for initial data
+
+## Modules & Plugins
+
+- Place custom modules in `modules/` directory
+- Use proper module structure with `index.ts` and runtime files
+- Implement client-side plugins in `plugins/` directory with `.client` suffix when needed
+- Use Nuxt 4's module system for extending functionality
+
+## Performance
+
+- Use `useLazyAsyncData` for optional data that can load after initial render
+- Implement proper image optimization with Nuxt Image
+- Use proper bundle splitting with dynamic imports
+- Minimize client-side JavaScript bundle
+
+## Development & Build
+
+- Use the new build system with Vite
+- Leverage TypeScript strict mode configuration
+- Use proper environment variable handling with `useRuntimeConfig()`
+- Implement proper development vs production configuration separation

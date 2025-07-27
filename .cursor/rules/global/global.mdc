@@ -1,0 +1,37 @@
+---
+alwaysApply: true
+---
+
+# Global Project Rules
+
+## Development Commands
+
+- Never use 'nvm use 18' - the project should use the Node version specified in package.json or .nvmrc
+- Never run `bun run dev` automatically - let the user know when we want to check the development server, but they will run it themselves
+- Always use `bun` instead of `npm` for package management and script execution
+- Use `bun install` for installing dependencies, `bun add` for adding new packages
+
+## Code Quality
+
+- Follow TypeScript strict mode practices
+- Use proper error handling with try/catch blocks
+- Implement proper type safety throughout the codebase
+- Follow ESLint configuration rules (eslint.config.mjs)
+
+## File Organization
+
+- Keep components organized in logical folder structures
+- Use composables for reusable logic
+- Place types in the `/types` directory
+- Organize Shopify-related code in the appropriate modules/shopify structure
+
+## Performance
+
+- Optimize bundle size by avoiding unnecessary imports
+- Use lazy loading for components when appropriate
+- Implement proper caching strategies
+- Minimize client-side JavaScript when possible
+
+## Never Fix These Linter Errors
+
+- Never fix linter errors related to Statamic's Entry and Collection facades - these are faulty and should be ignored

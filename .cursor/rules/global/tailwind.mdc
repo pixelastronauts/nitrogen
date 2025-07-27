@@ -1,0 +1,96 @@
+---
+alwaysApply: true
+---
+
+# Tailwind V4 Rules
+
+## Framework & Setup
+
+- Use Tailwind CSS V4 with the new CSS-first configuration approach
+- Leverage the new `@import "tailwindcss"` directive in CSS files
+- Use the updated configuration syntax and features specific to V4
+- Implement proper CSS layer organization (@layer base, components, utilities)
+
+## Class Organization
+
+- Use Tailwind's utility-first approach consistently
+- Group related classes logically (layout, spacing, colors, typography)
+- Use responsive prefixes properly (sm:, md:, lg:, xl:, 2xl:)
+- Implement proper hover, focus, and other state variants
+
+## CSS Architecture
+
+- Place custom CSS in `app/assets/styles/app.css`
+- Use `@layer` directives to organize custom styles
+- Implement proper CSS custom properties (CSS variables) for theming
+- Use Tailwind's new V4 features for better CSS organization
+
+## Component Styling
+
+- Prefer utility classes over custom CSS when possible
+- Use `@apply` directive sparingly and only for repetitive patterns
+- Implement proper design system tokens through Tailwind configuration
+- Create reusable component patterns with consistent spacing and typography
+
+## Responsive Design
+
+- Use mobile-first responsive design approach
+- Implement proper breakpoint usage (sm:, md:, lg:, xl:, 2xl:)
+- Use container classes and max-width utilities appropriately
+- Ensure proper touch targets and mobile usability
+
+## Typography
+
+- Use Tailwind's typography utilities consistently
+- Implement proper font sizes, line heights, and letter spacing
+- Use the font family utilities for consistent typography
+- Implement proper text color hierarchy and contrast
+
+## Colors & Theming
+
+- Use Tailwind's color palette consistently
+- Implement proper semantic color naming (primary, secondary, accent)
+- Use CSS custom properties for dynamic theming if needed
+- Ensure proper contrast ratios for accessibility
+
+## Spacing & Layout
+
+- Use Tailwind's spacing scale consistently (p-4, m-8, gap-6, etc.)
+- Implement proper flexbox and grid layouts
+- Use aspect ratio utilities for consistent image/media sizing
+- Apply consistent spacing patterns throughout components
+
+## Performance
+
+- Purge unused Tailwind classes in production builds
+- Use Tailwind V4's improved tree-shaking capabilities
+- Avoid overly complex utility combinations
+- Leverage Tailwind's JIT mode for optimal build performance
+
+## Dark Mode & Variants
+
+- Implement dark mode using Tailwind's `dark:` variant
+- Use proper state variants (hover:, focus:, active:, disabled:)
+- Implement group and peer variants for complex interactions
+- Use arbitrary value syntax sparingly and only when necessary
+
+## Accessibility
+
+- Use Tailwind's accessibility utilities (sr-only, focus-visible)
+- Implement proper focus management with focus: variants
+- Ensure sufficient color contrast using Tailwind's color system
+- Use semantic HTML with appropriate Tailwind styling
+
+## Custom Utilities
+
+- Create custom utilities using `@layer utilities` when needed
+- Use the new V4 plugin system for complex customizations
+- Implement proper naming conventions for custom utilities
+- Document custom utilities for team consistency
+
+## Shopify Integration
+
+- Style Shopify components consistently with the design system
+- Use Tailwind for responsive product grids and cards
+- Implement proper cart and checkout flow styling
+- Ensure consistent styling across Shopify and custom components
