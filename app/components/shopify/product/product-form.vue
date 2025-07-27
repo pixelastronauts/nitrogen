@@ -23,13 +23,22 @@ const variantQuery = computed(() => route.query.variant as string | undefined);
 const selectedSize = ref("");
 
 // Computed
-const currentVariant = computed(() =>
-  props.variants.find((variant) =>
+const currentVariant = computed(() => {
+  // First, try to find variant from URL query parameter (for color selection)
+  if (variantQuery.value) {
+    const urlVariant = props.variants.find(
+      (variant) => formatVariantId(variant.id) === variantQuery.value,
+    );
+    if (urlVariant) return urlVariant;
+  }
+
+  // Fall back to size-based selection if no URL variant found
+  return props.variants.find((variant) =>
     variant.selectedOptions.every(({ name, value }) =>
       isSizeOption(name) ? value === selectedSize.value : true,
     ),
-  ),
-);
+  );
+});
 
 // Check if this is a mat product that needs the configurator
 const isMatProduct = computed(() => {

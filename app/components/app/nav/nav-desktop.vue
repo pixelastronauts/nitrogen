@@ -8,6 +8,10 @@ const navLinksLeft = [
     label: t("navigation.shop"),
     path: "/collections/design-entreematten-op-maat",
   },
+  {
+    label: t("navigation.samples"),
+    path: "/collections/samples",
+  },
   { label: t("navigation.collections"), path: "/collections/latest" },
   { label: t("navigation.about"), path: "/collections/latest" },
 ];

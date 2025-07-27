@@ -16,14 +16,20 @@ const props = defineProps<{
 // State for image preview on hover
 const hoveredVariantId = ref<string | null>(null);
 
+// State for currently selected variant
+const selectedVariant = ref<ProductVariantFragment>(props.variant);
+
+// Track if user has actively selected a variant (vs initial state)
+const hasUserSelectedVariant = ref(false);
+
 // Get all available variants for this product (filtered)
 const availableVariants = computed(() => {
   const variants = flattenConnection(
-    props.product.variants
+    props.product.variants,
   ) as ProductVariantFragment[];
   return variants.filter(
     (variant) =>
-      !variant.sku?.startsWith("ST_") && !variant.title?.startsWith("ST_")
+      !variant.sku?.startsWith("ST_") && !variant.title?.startsWith("ST_"),
   );
 });
 
@@ -32,16 +38,16 @@ const displayImage = computed(() => {
   // If hovering over a variant, show that variant's image
   if (hoveredVariantId.value) {
     const hoveredVariant = availableVariants.value.find(
-      (v) => v.id === hoveredVariantId.value
+      (v) => v.id === hoveredVariantId.value,
     );
     if (hoveredVariant?.image) {
       return hoveredVariant.image;
     }
   }
 
-  // Use current variant image if available, otherwise fall back to product featured image
-  if (props.variant.image) {
-    return props.variant.image;
+  // Use currently selected variant image if available, otherwise fall back to product featured image
+  if (selectedVariant.value.image) {
+    return selectedVariant.value.image;
   }
   return props.product.featuredImage;
 });
@@ -55,12 +61,15 @@ const mediaItems = computed(() => {
 const colorOption = computed(() => getColorOption(props.product.options));
 const variantTitle = computed(() => {
   // If variant has a specific title different from product, use it
-  if (props.variant.title && props.variant.title !== "Default Title") {
-    return props.variant.title;
+  if (
+    selectedVariant.value.title &&
+    selectedVariant.value.title !== "Default Title"
+  ) {
+    return selectedVariant.value.title;
   }
 
   // Otherwise, construct title from selected options
-  const selectedOptions = props.variant.selectedOptions;
+  const selectedOptions = selectedVariant.value.selectedOptions;
   if (selectedOptions && selectedOptions.length > 0) {
     const optionValues = selectedOptions
       .filter((option) => option.value !== "Default Title")
@@ -81,13 +90,15 @@ const displayTitle = computed(() => {
   return props.product.title;
 });
 
-const variantPrice = computed(() => props.variant.price);
-const variantCompareAtPrice = computed(() => props.variant.compareAtPrice);
+const variantPrice = computed(() => selectedVariant.value.price);
+const variantCompareAtPrice = computed(
+  () => selectedVariant.value.compareAtPrice,
+);
 </script>
 
 <template>
   <NuxtLink
-    :to="`/products/${product.handle}?variant=${variant.id}`"
+    :to="`/products/${product.handle}?variant=${selectedVariant.id.split('/').pop()}`"
     class="relative flex flex-col gap-4"
   >
     <ProductCardTags :product="product" />
@@ -110,17 +121,32 @@ const variantCompareAtPrice = computed(() => props.variant.compareAtPrice);
       v-if="availableVariants.length > 1"
       class="flex flex-wrap gap-2 justify-center py-2"
     >
-      <NuxtLink
+      <button
         v-for="variantOption in availableVariants"
         :key="variantOption.id"
-        :to="`/products/${product.handle}?variant=${variantOption.id}`"
-        class="group relative w-8 h-8 rounded-full border-2 border-zinc-300 overflow-hidden transition-all duration-200 hover:border-zinc-800 hover:scale-110"
+        type="button"
+        class="group relative w-8 h-8 rounded-full border-2 border-zinc-300 overflow-hidden transition-all duration-200 hover:border-zinc-800 hover:scale-110 cursor-pointer"
         :class="{
           'border-zinc-800 ring-2 ring-zinc-800 ring-offset-2':
-            variantOption.id === variant.id,
+            variantOption.id === selectedVariant.id,
         }"
         @mouseenter="hoveredVariantId = variantOption.id"
         @mouseleave="hoveredVariantId = null"
+        @click.prevent.stop="
+          if (
+            hasUserSelectedVariant &&
+            selectedVariant.id === variantOption.id
+          ) {
+            // If user already selected this variant, navigate to it
+            $router.push(
+              `/products/${product.handle}?variant=${variantOption.id.split('/').pop()}`,
+            );
+          } else {
+            // Select the variant and mark as user-selected
+            selectedVariant = variantOption;
+            hasUserSelectedVariant = true;
+          }
+        "
       >
         <!-- Show variant image if available, otherwise show a color/pattern indicator -->
         <div v-if="variantOption.image" class="w-full h-full">
@@ -145,22 +171,25 @@ const variantCompareAtPrice = computed(() => props.variant.compareAtPrice);
         >
           {{ variantOption.title }}
         </div>
-      </NuxtLink>
+      </button>
     </div>
 
     <div class="flex flex-col gap-2">
       <div>
         <h2 class="uppercase">{{ product.title }}</h2>
         <h3 v-if="variantTitle">{{ variantTitle }}</h3>
-        <p v-if="variant.sku" class="text-sm text-zinc-500">
-          SKU: {{ variant.sku }}
+        <p v-if="selectedVariant.sku" class="text-sm text-zinc-500">
+          SKU: {{ selectedVariant.sku }}
         </p>
       </div>
       <PriceDisplay
         :price="variantPrice"
         :compare-at-price="variantCompareAtPrice"
       />
-      <div v-if="!variant.availableForSale" class="text-sm text-red-600">
+      <div
+        v-if="!selectedVariant.availableForSale"
+        class="text-sm text-red-600"
+      >
         Out of Stock
       </div>
     </div>
