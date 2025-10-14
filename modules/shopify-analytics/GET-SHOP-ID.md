@@ -19,7 +19,7 @@ npx tsx modules/shopify-analytics/scripts/get-shop-id.ts
 
 This will output your Shop ID ready to copy into your `.env` file.
 
-### Option 2: Shopify Admin Graph
+### Option 2: Shopify Admin GraphQL
 
 1. **Go to Shopify Admin**
    - URL: `https://admin.shopify.com/store/YOUR_STORE`
