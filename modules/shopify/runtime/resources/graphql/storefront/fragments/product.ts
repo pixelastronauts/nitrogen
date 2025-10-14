@@ -42,6 +42,7 @@ export const PRODUCT_FRAGMENT = gql`
     totalInventory
     trackingParameters
     updatedAt
+    vendor
     variants(first: 250) {
       edges {
         node {

@@ -11,7 +11,7 @@ export default defineNuxtConfig({
     '@nuxt/icon',
     '@nuxt/fonts',
     '@nuxt/eslint',
-    '@nuxthub/core',
+    '@nuxthub/core'
   ],
 
   shopify: {
@@ -25,6 +25,14 @@ export default defineNuxtConfig({
     apiVersion: process.env.NUXT_KLAVIYO_API_VERSION,
     publicApiKey: process.env.NUXT_KLAVIYO_PUBLIC_API_KEY,
     privateApiKey: process.env.NUXT_KLAVIYO_PRIVATE_API_KEY,
+  },
+
+  shopifyAnalytics: {
+    enabled: true,
+    shopId: process.env.NUXT_SHOPIFY_SHOP_ID || '',
+    currency: process.env.NUXT_SHOPIFY_CURRENCY || 'USD',
+    acceptedLanguage: process.env.NUXT_SHOPIFY_LANGUAGE || 'en',
+    hydrogenSubchannelId: process.env.NUXT_SHOPIFY_SUBCHANNEL_ID,
   },
 
   site: {
