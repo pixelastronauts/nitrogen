@@ -118,14 +118,56 @@ export function parseGid(gid: string | undefined): string {
 }
 
 /**
- * Generates a UUID v4
+ * Generates a hex timestamp (like Hydrogen)
+ */
+function hexTime(): string {
+  const dateNumber = new Date().getTime() >>> 0
+  
+  let perfNumber = 0
+  try {
+    perfNumber = performance.now() >>> 0
+  }
+  catch {
+    perfNumber = 0
+  }
+
+  const output = Math.abs(dateNumber + perfNumber)
+    .toString(16)
+    .toLowerCase()
+
+  return output.padStart(8, '0')
+}
+
+/**
+ * Generates a UUID v4 with timestamp prefix (like Hydrogen)
  */
 function generateUUID(): string {
-  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
-    const r = (Math.random() * 16) | 0
-    const v = c === 'x' ? r : (r & 0x3) | 0x8
-    return v.toString(16)
-  })
+  const tokenHash = 'xxxx-4xxx-xxxx-xxxxxxxxxxxx'
+  
+  let hash = ''
+  try {
+    const crypto = window.crypto
+    const randomValuesArray = new Uint16Array(31)
+    crypto.getRandomValues(randomValuesArray)
+
+    let i = 0
+    hash = tokenHash.replace(/[x]/g, (c) => {
+      const r = randomValuesArray[i] % 16
+      const v = c === 'x' ? r : (r & 0x3) | 0x8
+      i++
+      return v.toString(16)
+    }).toUpperCase()
+  }
+  catch {
+    // Fallback if crypto not available
+    hash = tokenHash.replace(/[x]/g, (c) => {
+      const r = (Math.random() * 16) | 0
+      const v = c === 'x' ? r : (r & 0x3) | 0x8
+      return v.toString(16)
+    }).toUpperCase()
+  }
+
+  return `${hexTime()}-${hash}`
 }
 
 /**
