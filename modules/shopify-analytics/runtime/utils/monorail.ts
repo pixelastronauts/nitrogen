@@ -356,6 +356,14 @@ export async function sendToMonorail(
     },
   }
 
+  if (import.meta.dev) {
+    console.log('[shopify-analytics] Sending events to Monorail:', {
+      endpoint,
+      eventCount: events.length,
+      events: events.map(e => e.payload.event_name),
+    })
+  }
+
   try {
     const response = await fetch(endpoint, {
       method: 'POST',

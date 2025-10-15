@@ -51,6 +51,10 @@ export default defineNuxtModule<ModuleOptions>({
         name: 'useShopifyCookies',
         from: resolve('runtime/composables/use-shopify-cookies'),
       },
+      {
+        name: 'useCartAnalytics',
+        from: resolve('runtime/composables/use-cart-analytics'),
+      },
     ])
 
     // Add client plugin

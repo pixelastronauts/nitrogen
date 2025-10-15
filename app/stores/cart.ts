@@ -106,34 +106,6 @@ export const useCartStore = defineStore('@nikkoel/cart', {
         }
 
         this.cart = response?.cart
-
-        // Track add to cart analytics
-        if (import.meta.client && this.cart?.lines?.edges) {
-          try {
-            const { publish, AnalyticsEvent, getShop } = useShopifyAnalytics()
-            const shop = getShop()
-            
-            if (shop?.shopId) {
-              // Find the newly added line(s)
-              const addedLines = this.cart.lines.edges
-                .map(edge => edge.node)
-                .slice(-lines.length) // Get the last N lines that were just added
-
-              // Track each added line
-              for (const line of addedLines) {
-                publish(AnalyticsEvent.PRODUCT_ADD_TO_CART, {
-                  url: window.location.href,
-                  shop,
-                  cart: this.cart,
-                  currentLine: line,
-                })
-              }
-            }
-          } catch (analyticsError) {
-            // Don't fail the add to cart if analytics fails
-            console.warn('[cart] Analytics tracking failed:', analyticsError)
-          }
-        }
       } catch (error) {
         console.error('Cannot add lines:', error)
         throw error
