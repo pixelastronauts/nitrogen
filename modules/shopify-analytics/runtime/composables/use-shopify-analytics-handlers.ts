@@ -74,6 +74,10 @@ export function useShopifyAnalyticsHandlers() {
 
   /**
    * Handles product view events
+   * 
+   * Following Hydrogen's pattern, this sends TWO events:
+   * 1. General page_rendered event (required for Live View session tracking)
+   * 2. Product-specific product_page_rendered event
    */
   async function handleProductView(payload: ProductViewPayload) {
     const basePayload = prepareBasePayload(payload)
@@ -102,13 +106,24 @@ export function useShopifyAnalyticsHandlers() {
     basePayload.pageType = AnalyticsPageType.product
     basePayload.resourceId = formattedProducts[0]?.productGid
 
-    const event = createProductViewEvent(basePayload)
     const shopDomain = (useRuntimeConfig().public.shopify as any)?.domain
-    await sendToMonorail([event], shopDomain)
+    
+    // Send BOTH events like Hydrogen does:
+    // 1. General page view (required for Live View)
+    const pageViewEvent = createPageViewEvent(basePayload)
+    // 2. Product-specific view
+    const productViewEvent = createProductViewEvent(basePayload)
+    
+    // Send both events in a single batch
+    await sendToMonorail([pageViewEvent, productViewEvent], shopDomain)
   }
 
   /**
    * Handles collection view events
+   * 
+   * Following Hydrogen's pattern, this sends TWO events:
+   * 1. General page_rendered event (required for Live View session tracking)
+   * 2. Collection-specific collection_page_rendered event
    */
   async function handleCollectionView(payload: CollectionViewPayload) {
     const basePayload = prepareBasePayload(payload)
@@ -120,13 +135,24 @@ export function useShopifyAnalyticsHandlers() {
     basePayload.collectionHandle = payload.collection.handle
     basePayload.collectionId = payload.collection.id
 
-    const event = createCollectionViewEvent(basePayload)
     const shopDomain = (useRuntimeConfig().public.shopify as any)?.domain
-    await sendToMonorail([event], shopDomain)
+    
+    // Send BOTH events like Hydrogen does:
+    // 1. General page view (required for Live View)
+    const pageViewEvent = createPageViewEvent(basePayload)
+    // 2. Collection-specific view
+    const collectionViewEvent = createCollectionViewEvent(basePayload)
+    
+    // Send both events in a single batch
+    await sendToMonorail([pageViewEvent, collectionViewEvent], shopDomain)
   }
 
   /**
    * Handles search view events
+   * 
+   * Following Hydrogen's pattern, this sends TWO events:
+   * 1. General page_rendered event (required for Live View session tracking)
+   * 2. Search-specific search_submitted event
    */
   async function handleSearchView(payload: SearchViewPayload) {
     const basePayload = prepareBasePayload(payload)
@@ -136,9 +162,16 @@ export function useShopifyAnalyticsHandlers() {
     basePayload.pageType = AnalyticsPageType.search
     basePayload.searchString = payload.searchTerm
 
-    const event = createSearchViewEvent(basePayload)
     const shopDomain = (useRuntimeConfig().public.shopify as any)?.domain
-    await sendToMonorail([event], shopDomain)
+    
+    // Send BOTH events like Hydrogen does:
+    // 1. General page view (required for Live View)
+    const pageViewEvent = createPageViewEvent(basePayload)
+    // 2. Search-specific view
+    const searchViewEvent = createSearchViewEvent(basePayload)
+    
+    // Send both events in a single batch
+    await sendToMonorail([pageViewEvent, searchViewEvent], shopDomain)
   }
 
   /**
