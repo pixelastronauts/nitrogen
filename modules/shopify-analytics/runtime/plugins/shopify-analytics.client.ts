@@ -27,9 +27,12 @@ export default defineNuxtPlugin((nuxtApp) => {
     })
 
     // Set Shopify cookies for session tracking (enables Live View)
+    // Use checkout domain to ensure cookies work across storefront and checkout
+    const checkoutDomain = useRuntimeConfig().public.checkoutDomain || shopifyConfig?.domain
+    
     useShopifyCookies({
       hasUserConsent: true,
-      checkoutDomain: shopifyConfig?.domain,
+      checkoutDomain,
     })
 
     // Register Shopify analytics system

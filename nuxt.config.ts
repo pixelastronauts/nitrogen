@@ -27,6 +27,8 @@ export default defineNuxtConfig({
       shopify: {
         domain: process.env.NUXT_SHOPIFY_DOMAIN,
       },
+      // Checkout domain for cookie sharing and Live View
+      checkoutDomain: process.env.NUXT_PUBLIC_CHECKOUT_DOMAIN || process.env.NUXT_SHOPIFY_DOMAIN,
     },
   },
 
