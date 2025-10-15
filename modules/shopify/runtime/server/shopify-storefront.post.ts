@@ -18,16 +18,19 @@ export default defineEventHandler(async (event) => {
 
   // CRITICAL: Forward Shopify session headers to enable Live View tracking
   // See: https://github.com/Shopify/hydrogen/pull/614
+  // See: https://github.com/Shopify/hydrogen/issues/701
   
   // 1. Forward Shopify session cookies
+  // For headless storefronts, use Shopify-Storefront-Y/S headers instead of Cookie
   const shopifyY = getCookie(event, '_shopify_y')
   const shopifyS = getCookie(event, '_shopify_s')
   
-  if (shopifyY || shopifyS) {
-    const cookieParts = []
-    if (shopifyY) cookieParts.push(`_shopify_y=${shopifyY}`)
-    if (shopifyS) cookieParts.push(`_shopify_s=${shopifyS}`)
-    headers['Cookie'] = cookieParts.join('; ')
+  if (shopifyY) {
+    headers['Shopify-Storefront-Y'] = shopifyY
+  }
+  
+  if (shopifyS) {
+    headers['Shopify-Storefront-S'] = shopifyS
   }
 
   // 2. Forward buyer IP (required for Live View session tracking)
