@@ -213,6 +213,24 @@ export function useShopifyAnalyticsHandlers() {
     }
 
     basePayload.products = [product]
+    
+    // Add cart total value
+    const cartTotal = cart.cost?.totalAmount?.amount
+    if (cartTotal) {
+      basePayload.totalValue = parseFloat(cartTotal)
+    }
+
+    if (import.meta.dev) {
+      console.log('[add-to-cart] Tracking:', {
+        cartId: cart.id,
+        cartToken: cart.id?.split('/')?.pop(),
+        product: product.name,
+        quantity: product.quantity,
+        cartTotal,
+        uniqueToken: browserParams.uniqueToken,
+        visitToken: browserParams.visitToken,
+      })
+    }
 
     const event = createAddToCartEvent(basePayload)
     const shopDomain = useRuntimeConfig().public.shopify?.domain

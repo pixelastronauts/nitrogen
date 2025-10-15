@@ -152,7 +152,7 @@ function generateUUID(): string {
 
     let i = 0
     hash = tokenHash.replace(/[x]/g, (c) => {
-      const r = randomValuesArray[i] % 16
+      const r = (randomValuesArray[i] || 0) % 16
       const v = c === 'x' ? r : (r & 0x3) | 0x8
       i++
       return v.toString(16)
@@ -323,6 +323,7 @@ export function createAddToCartEvent(
     ...basePayload,
     event_name: EVENT_NAMES.PRODUCT_ADDED_TO_CART,
     cart_token: payload.cartId ? parseGid(payload.cartId) : undefined,
+    total_value: payload.totalValue,
     products,
   }
 

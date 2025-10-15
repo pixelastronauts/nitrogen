@@ -115,6 +115,7 @@ export interface ShopifyAnalyticsPayload extends ClientBrowserParameters {
     sku?: string | null
   }>
   cartId?: string
+  totalValue?: number
 }
 
 // Event Payloads Map
