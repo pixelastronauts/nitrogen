@@ -54,9 +54,9 @@ export interface SearchViewPayload extends BasePayload, UrlPayload {
 }
 
 // Cart Payloads
-export interface CartUpdatePayload extends BasePayload {
+export interface CartUpdatePayload extends BasePayload, UrlPayload {
   cart: any
-  prevCart: any
+  prevCart?: any
 }
 
 export interface CartLineUpdatePayload extends CartUpdatePayload {

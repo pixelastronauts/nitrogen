@@ -18,11 +18,14 @@ export const PRODUCT_VARIANT_FRAGMENT = gql`
       ...Money
     }
     product {
+      id
       featuredImage {
         ...Image
       }
       handle
       title
+      vendor
+      productType
     }
     quantityAvailable
     requiresShipping
