@@ -29,20 +29,29 @@ export default defineNuxtModule<ModuleOptions>({
     shopId: '',
     currency: 'USD',
     acceptedLanguage: 'en',
-    hydrogenSubchannelId: undefined,
+    hydrogenSubchannelId: '',
   },
 
   setup(options, nuxt) {
     // Add to public runtime config
-    nuxt.options.runtimeConfig.public.shopifyAnalytics = options
+    nuxt.options.runtimeConfig.public.shopifyAnalytics = {
+      ...options,
+      hydrogenSubchannelId: options.hydrogenSubchannelId || '',
+    }
 
     const { resolve } = createResolver(import.meta.url)
 
     // Add composables
-    addImports({
-      name: 'useShopifyAnalytics',
-      from: resolve('runtime/composables/use-shopify-analytics'),
-    })
+    addImports([
+      {
+        name: 'useShopifyAnalytics',
+        from: resolve('runtime/composables/use-shopify-analytics'),
+      },
+      {
+        name: 'useShopifyCookies',
+        from: resolve('runtime/composables/use-shopify-cookies'),
+      },
+    ])
 
     // Add client plugin
     addPlugin({

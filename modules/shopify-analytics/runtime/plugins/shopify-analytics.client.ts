@@ -1,10 +1,13 @@
 import { defineNuxtPlugin } from '#app'
 import { useShopifyAnalytics } from '../composables/use-shopify-analytics'
 import { useShopifyAnalyticsHandlers } from '../composables/use-shopify-analytics-handlers'
+import { useShopifyCookies } from '../composables/use-shopify-cookies'
 import { AnalyticsEvent } from '../types/events'
 
 export default defineNuxtPlugin((nuxtApp) => {
   const config = nuxtApp.$config.public.shopifyAnalytics
+  const shopifyConfig = nuxtApp.$config.public.shopify
+  
   const { subscribe, register, setShop, getShop } = useShopifyAnalytics()
   const {
     handlePageView,
@@ -21,6 +24,12 @@ export default defineNuxtPlugin((nuxtApp) => {
       currency: config.currency || 'USD',
       acceptedLanguage: config.acceptedLanguage || 'en',
       hydrogenSubchannelId: config.hydrogenSubchannelId,
+    })
+
+    // Set Shopify cookies for session tracking (enables Live View)
+    useShopifyCookies({
+      hasUserConsent: true,
+      checkoutDomain: shopifyConfig?.domain,
     })
 
     // Register Shopify analytics system
