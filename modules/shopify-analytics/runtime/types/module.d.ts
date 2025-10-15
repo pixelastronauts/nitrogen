@@ -6,6 +6,10 @@ declare module '@nuxt/schema' {
   }
   interface PublicRuntimeConfig {
     shopifyAnalytics: ModuleOptions
+    shopify?: {
+      domain?: string
+    }
+    checkoutDomain?: string
   }
 }
 
@@ -15,6 +19,10 @@ declare module 'nuxt/schema' {
   }
   interface PublicRuntimeConfig {
     shopifyAnalytics: ModuleOptions
+    shopify?: {
+      domain?: string
+    }
+    checkoutDomain?: string
   }
 }
 

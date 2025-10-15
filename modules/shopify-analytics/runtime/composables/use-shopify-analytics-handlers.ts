@@ -68,7 +68,7 @@ export function useShopifyAnalyticsHandlers() {
       return
 
     const event = createPageViewEvent(basePayload)
-    const shopDomain = (useRuntimeConfig().public.shopify as any)?.domain
+    const shopDomain = useRuntimeConfig().public.shopify?.domain
     await sendToMonorail([event], shopDomain)
   }
 
@@ -106,7 +106,7 @@ export function useShopifyAnalyticsHandlers() {
     basePayload.pageType = AnalyticsPageType.product
     basePayload.resourceId = formattedProducts[0]?.productGid
 
-    const shopDomain = (useRuntimeConfig().public.shopify as any)?.domain
+    const shopDomain = useRuntimeConfig().public.shopify?.domain
     
     // Send BOTH events like Hydrogen does:
     // 1. General page view (required for Live View)
@@ -135,7 +135,7 @@ export function useShopifyAnalyticsHandlers() {
     basePayload.collectionHandle = payload.collection.handle
     basePayload.collectionId = payload.collection.id
 
-    const shopDomain = (useRuntimeConfig().public.shopify as any)?.domain
+    const shopDomain = useRuntimeConfig().public.shopify?.domain
     
     // Send BOTH events like Hydrogen does:
     // 1. General page view (required for Live View)
@@ -162,7 +162,7 @@ export function useShopifyAnalyticsHandlers() {
     basePayload.pageType = AnalyticsPageType.search
     basePayload.searchString = payload.searchTerm
 
-    const shopDomain = (useRuntimeConfig().public.shopify as any)?.domain
+    const shopDomain = useRuntimeConfig().public.shopify?.domain
     
     // Send BOTH events like Hydrogen does:
     // 1. General page view (required for Live View)
@@ -215,7 +215,7 @@ export function useShopifyAnalyticsHandlers() {
     basePayload.products = [product]
 
     const event = createAddToCartEvent(basePayload)
-    const shopDomain = (useRuntimeConfig().public.shopify as any)?.domain
+    const shopDomain = useRuntimeConfig().public.shopify?.domain
     await sendToMonorail([event], shopDomain)
   }
 
