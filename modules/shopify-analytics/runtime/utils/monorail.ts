@@ -185,6 +185,7 @@ function cleanPayload(obj: Record<string, any>): Record<string, any> {
 
 /**
  * Creates base payload for all events
+ * NOTE: Do NOT use cleanPayload on this - Shopify requires certain fields even if empty
  */
 function createBasePayload(payload: ShopifyAnalyticsPayload): ShopifyMonorailPayload {
   return {
@@ -195,13 +196,14 @@ function createBasePayload(payload: ShopifyAnalyticsPayload): ShopifyMonorailPay
     shop_id: parseInt(parseGid(payload.shopId)),
     currency: payload.currency,
     
-    source: payload.shopifySalesChannel || 'headless',
+    source: payload.shopifySalesChannel || 'hydrogen',
     asset_version_id: payload.assetVersionId || '1.0.0',
     hydrogenSubchannelId: payload.hydrogenSubchannelId || '0',
     
     unique_token: payload.uniqueToken || '',
     deprecated_visit_token: payload.visitToken || '',
     
+    // CRITICAL: Shopify requires referrer field even if empty for session tracking
     referrer: payload.referrer || '',
     user_agent: payload.userAgent || '',
     
@@ -271,6 +273,7 @@ export function createProductViewEvent(
 export function createCollectionViewEvent(
   payload: ShopifyAnalyticsPayload,
 ): ShopifyMonorailEvent {
+  // Don't clean the base payload - Shopify requires referrer even if empty
   const monorailPayload: ShopifyMonorailPayload = {
     ...createBasePayload(payload),
     event_name: EVENT_NAMES.COLLECTION_PAGE_RENDERED,
@@ -278,7 +281,7 @@ export function createCollectionViewEvent(
     collection_id: payload.collectionId ? parseInt(parseGid(payload.collectionId)) : undefined,
   }
 
-  return schemaWrapper(SCHEMA_ID, cleanPayload(monorailPayload))
+  return schemaWrapper(SCHEMA_ID, monorailPayload)
 }
 
 /**
@@ -319,6 +322,7 @@ export function createAddToCartEvent(
     sku: p.sku,
   }))) || []
 
+  // Don't clean the base payload - Shopify requires referrer even if empty
   const monorailPayload: ShopifyMonorailPayload = {
     ...basePayload,
     event_name: EVENT_NAMES.PRODUCT_ADDED_TO_CART,
@@ -327,7 +331,7 @@ export function createAddToCartEvent(
     products,
   }
 
-  return schemaWrapper(SCHEMA_ID, cleanPayload(monorailPayload))
+  return schemaWrapper(SCHEMA_ID, monorailPayload)
 }
 
 /**
