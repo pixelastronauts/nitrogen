@@ -289,6 +289,7 @@ export function createAddToCartEvent(
 
 /**
  * Sends events to Shopify Monorail endpoint
+ * IMPORTANT: Always use shop domain to avoid CORS issues
  */
 export async function sendToMonorail(
   events: ShopifyMonorailEvent[],
@@ -297,9 +298,14 @@ export async function sendToMonorail(
   if (!events.length)
     return
 
-  const endpoint = shopDomain
-    ? `https://${shopDomain}/.well-known/shopify/monorail/unstable/produce_batch`
-    : 'https://monorail-edge.shopifysvc.com/unstable/produce_batch'
+  // Always use shop domain endpoint to avoid CORS issues
+  // The edge endpoint blocks requests from non-Shopify domains
+  if (!shopDomain) {
+    console.error('[shopify-analytics] Shop domain required for analytics. Please configure NUXT_SHOPIFY_DOMAIN.')
+    return
+  }
+
+  const endpoint = `https://${shopDomain}/.well-known/shopify/monorail/unstable/produce_batch`
 
   const body = {
     events,
@@ -318,7 +324,16 @@ export async function sendToMonorail(
     })
 
     if (!response.ok) {
-      console.error('[shopify-analytics] Failed to send analytics', response.status)
+      const text = await response.text()
+      console.error('[shopify-analytics] Failed to send analytics', {
+        status: response.status,
+        response: text,
+      })
+    }
+    else {
+      if (import.meta.dev) {
+        console.log('[shopify-analytics] Event sent successfully')
+      }
     }
   }
   catch (error) {

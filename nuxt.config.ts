@@ -11,7 +11,7 @@ export default defineNuxtConfig({
     '@nuxt/icon',
     '@nuxt/fonts',
     '@nuxt/eslint',
-    '@nuxthub/core'
+    '@nuxthub/core',
   ],
 
   shopify: {
@@ -19,6 +19,15 @@ export default defineNuxtConfig({
     apiVersion: process.env.NUXT_SHOPIFY_API_VERSION,
     adminAccessToken: process.env.NUXT_SHOPIFY_ADMIN_ACCESS_TOKEN,
     storefrontAccessToken: process.env.NUXT_SHOPIFY_STOREFRONT_ACCESS_TOKEN,
+  },
+
+  // Make shopify domain available on client for analytics
+  runtimeConfig: {
+    public: {
+      shopify: {
+        domain: process.env.NUXT_SHOPIFY_DOMAIN,
+      },
+    },
   },
 
   klaviyo: {

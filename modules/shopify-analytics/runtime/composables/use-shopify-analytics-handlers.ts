@@ -68,7 +68,8 @@ export function useShopifyAnalyticsHandlers() {
       return
 
     const event = createPageViewEvent(basePayload)
-    await sendToMonorail([event])
+    const shopDomain = useRuntimeConfig().public.shopify?.domain
+    await sendToMonorail([event], shopDomain)
   }
 
   /**
@@ -102,7 +103,8 @@ export function useShopifyAnalyticsHandlers() {
     basePayload.resourceId = formattedProducts[0].productGid
 
     const event = createProductViewEvent(basePayload)
-    await sendToMonorail([event])
+    const shopDomain = useRuntimeConfig().public.shopify?.domain
+    await sendToMonorail([event], shopDomain)
   }
 
   /**
@@ -119,7 +121,8 @@ export function useShopifyAnalyticsHandlers() {
     basePayload.collectionId = payload.collection.id
 
     const event = createCollectionViewEvent(basePayload)
-    await sendToMonorail([event])
+    const shopDomain = useRuntimeConfig().public.shopify?.domain
+    await sendToMonorail([event], shopDomain)
   }
 
   /**
@@ -134,7 +137,8 @@ export function useShopifyAnalyticsHandlers() {
     basePayload.searchString = payload.searchTerm
 
     const event = createSearchViewEvent(basePayload)
-    await sendToMonorail([event])
+    const shopDomain = useRuntimeConfig().public.shopify?.domain
+    await sendToMonorail([event], shopDomain)
   }
 
   /**
@@ -178,7 +182,8 @@ export function useShopifyAnalyticsHandlers() {
     basePayload.products = [product]
 
     const event = createAddToCartEvent(basePayload)
-    await sendToMonorail([event])
+    const shopDomain = useRuntimeConfig().public.shopify?.domain
+    await sendToMonorail([event], shopDomain)
   }
 
   return {
