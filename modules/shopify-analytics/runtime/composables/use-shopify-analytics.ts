@@ -1,10 +1,8 @@
 import type {
-  AnalyticsEventName,
-  BasePayload,
   EventPayloads,
   ShopAnalytics,
 } from '../types/payloads'
-import { AnalyticsEvent } from '../types/events'
+import { AnalyticsEvent, type AnalyticsEventName } from '../types/events'
 
 type SubscriberCallback = (payload: any) => void
 
@@ -82,7 +80,7 @@ export function useShopifyAnalytics() {
         // When all systems are ready, flush the queue
         if (areRegistersReady() && waitForReadyQueue.size > 0) {
           waitForReadyQueue.forEach((queuePayload, queueEvent) => {
-            publish(queueEvent, queuePayload)
+            publish(queueEvent as AnalyticsEventName, queuePayload)
           })
           waitForReadyQueue.clear()
         }
