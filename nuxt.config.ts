@@ -46,6 +46,10 @@ export default defineNuxtConfig({
     hydrogenSubchannelId: process.env.NUXT_SHOPIFY_SUBCHANNEL_ID,
   },
 
+  hub: {
+    cache: true
+  },
+
   site: {
     url: 'https://nitrogen.nuxt.dev',
     name: 'Nitrogen',
